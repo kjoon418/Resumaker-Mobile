@@ -23,6 +23,7 @@ import com.resumaker.app.model.Resume
 import com.resumaker.app.ui.careermanager.CareerManagerScreen
 import com.resumaker.app.ui.login.ResumakerLoginScreen
 import com.resumaker.app.ui.navigation.Routes
+import com.resumaker.app.ui.personamanagement.PersonaManagementScreen
 import com.resumaker.app.ui.resumelist.ResumeListScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
 
@@ -78,9 +79,13 @@ fun ResumakerApp(
         }
 
         composable(Routes.AllPersonas) {
-            PlaceholderScreen(
-                title = "면접관 페르소나",
-                onNavigateBack = { navController.popBackStack() }
+            PersonaManagementScreen(
+                personaList = samplePersonas,
+                onBackClick = { navController.popBackStack() },
+                onSearchClick = { },
+                onAddClick = { },
+                onEditClick = { },
+                onDeleteClick = { }
             )
         }
 
@@ -100,9 +105,9 @@ private val sampleResumes = listOf(
 )
 
 private val samplePersonas = listOf(
-    Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1"),
-    Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2"),
-    Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3")
+    Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1", "2025.02.05"),
+    Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2", "2025.02.03"),
+    Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3", "2025.02.01")
 )
 
 @Composable

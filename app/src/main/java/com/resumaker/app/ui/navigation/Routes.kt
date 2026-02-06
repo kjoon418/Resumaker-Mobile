@@ -8,6 +8,9 @@ object Routes {
     /** 로그인 화면 */
     const val Login = "login"
 
+    /** 회원가입 화면 */
+    const val SignUp = "signup"
+
     /** 홈 등 이후 추가할 화면 예시 */
     const val Home = "home"
 }

@@ -20,6 +20,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.resumaker.app.ui.login.ResumakerLoginScreen
 import com.resumaker.app.ui.navigation.Routes
+import com.resumaker.app.ui.signup.ResumakerSignUpScreen
 
 @Composable
 fun ResumakerApp(
@@ -38,7 +39,14 @@ fun ResumakerApp(
                         popUpTo(Routes.Login) { inclusive = true }
                     }
                 },
-                onNavigateToSignUp = { /* TODO: 회원가입 라우트 추가 후 이동 */ }
+                onNavigateToSignUp = { navController.navigate(Routes.SignUp) }
+            )
+        }
+
+        composable(Routes.SignUp) {
+            ResumakerSignUpScreen(
+                onBackClick = { navController.popBackStack() },
+                onLoginClick = { navController.popBackStack() }
             )
         }
 

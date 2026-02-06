@@ -20,6 +20,9 @@ object Routes {
     /** 면접관 페르소나 전체 목록 */
     const val AllPersonas = "personas"
 
-    /** 새 이력서 작성 (추후 구현) */
+    /** 새 이력서 작성 1단계: 기존 이력서 제출 */
     const val NewResume = "resumes/new"
+
+    /** 새 이력서 작성 2단계 (추후 구현) */
+    const val NewResumeStep2 = "resumes/new/step2"
 }

@@ -25,6 +25,7 @@ import com.resumaker.app.ui.login.ResumakerLoginScreen
 import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.personamanagement.PersonaManagementScreen
 import com.resumaker.app.ui.resumelist.ResumeListScreen
+import com.resumaker.app.ui.resumecreate.ResumeUploadScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
 
 @Composable
@@ -90,8 +91,19 @@ fun ResumakerApp(
         }
 
         composable(Routes.NewResume) {
+            ResumeUploadScreen(
+                onBackClick = { navController.popBackStack() },
+                onFileSelect = { },
+                onSkip = { navController.navigate(Routes.NewResumeStep2) },
+                onNext = { navController.navigate(Routes.NewResumeStep2) },
+                onRemoveUpload = { },
+                uploadedFileName = null
+            )
+        }
+
+        composable(Routes.NewResumeStep2) {
             PlaceholderScreen(
-                title = "새 이력서 작성",
+                title = "이력서 필수 정보",
                 onNavigateBack = { navController.popBackStack() }
             )
         }

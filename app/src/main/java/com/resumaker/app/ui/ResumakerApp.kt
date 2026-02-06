@@ -26,6 +26,7 @@ import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.personamanagement.PersonaManagementScreen
 import com.resumaker.app.ui.resumelist.ResumeListScreen
 import com.resumaker.app.ui.resumecreate.ResumeDetailInputScreen
+import com.resumaker.app.ui.resumecreate.ResumeGeneratingScreen
 import com.resumaker.app.ui.resumecreate.ResumeUploadScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
 
@@ -111,9 +112,8 @@ fun ResumakerApp(
         }
 
         composable(Routes.NewResumeStep3) {
-            PlaceholderScreen(
-                title = "이력서 생성 중",
-                onNavigateBack = { navController.popBackStack() }
+            ResumeGeneratingScreen(
+                onBackClick = { navController.popBackStack() }
             )
         }
     }

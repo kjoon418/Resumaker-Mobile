@@ -10,10 +10,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
@@ -33,29 +33,29 @@ import com.resumaker.app.component.section.SloganSection
 import com.resumaker.app.component.section.StrengthKeywordsSection
 import com.resumaker.app.component.section.TargetRoleSection
 import com.resumaker.app.component.section.TechStackSection
-import com.resumaker.app.model.ExtraInfoItem
-import com.resumaker.app.model.ProjectHistoryItem
 import com.resumaker.app.ui.theme.ResumakerTheme
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ResumeDetailInputScreen(
     onBackClick: () -> Unit,
     onNext: () -> Unit,
-    onFormatFileSelect: () -> Unit = {}
+    onFormatFileSelect: () -> Unit = {},
+    viewModel: ResumeDetailInputViewModel = koinViewModel()
 ) {
-    var resumeFormat by remember { mutableStateOf("") }
-    var targetRole by remember { mutableStateOf("") }
-    var slogan by remember { mutableStateOf("") }
-    val strengthKeywords = remember { mutableStateListOf<String>() }
-    val projectHistoryItems = remember { mutableStateListOf<ProjectHistoryItem>() }
-    var collaborationStyle by remember { mutableStateOf("") }
-    val techStacks = remember { mutableStateListOf("Java", "Spring Boot") }
-    var futureGoals by remember { mutableStateOf("") }
-    val extraItems = remember { mutableStateListOf<ExtraInfoItem>() }
+    val resumeFormat by viewModel.resumeFormat.collectAsState()
+    val targetRole by viewModel.targetRole.collectAsState()
+    val slogan by viewModel.slogan.collectAsState()
+    val strengthKeywords by viewModel.strengthKeywords.collectAsState()
+    val projectHistoryItems by viewModel.projectHistoryItems.collectAsState()
+    val collaborationStyle by viewModel.collaborationStyle.collectAsState()
+    val techStacks by viewModel.techStacks.collectAsState()
+    val futureGoals by viewModel.futureGoals.collectAsState()
+    val extraItems by viewModel.extraItems.collectAsState()
+    val wasPrefilledFromPdf by viewModel.wasPrefilledFromPdf.collectAsState()
 
     var showAddInfoDialog by remember { mutableStateOf(false) }
     var showAddProjectDialog by remember { mutableStateOf(false) }
-
     var newKeyword by remember { mutableStateOf("") }
     var showAddKeyword by remember { mutableStateOf(false) }
     var newTechStackName by remember { mutableStateOf("") }
@@ -70,7 +70,7 @@ fun ResumeDetailInputScreen(
         AddExtraInfoDialog(
             onDismiss = { showAddInfoDialog = false },
             onAdd = { item ->
-                extraItems.add(item)
+                viewModel.addExtraItem(item)
                 showAddInfoDialog = false
             }
         )
@@ -79,7 +79,7 @@ fun ResumeDetailInputScreen(
         AddProjectDialog(
             onDismiss = { showAddProjectDialog = false },
             onAdd = { item ->
-                projectHistoryItems.add(item)
+                viewModel.addProjectHistoryItem(item)
                 showAddProjectDialog = false
             },
             projectTitleFocusRequester = projectTitleFocusRequester
@@ -109,42 +109,44 @@ fun ResumeDetailInputScreen(
             StepProgressBar(currentStep = 2, stepTitle = "정보 입력")
             Spacer(modifier = Modifier.height(24.dp))
 
-            InfoBanner(
-                text = "AI 분석 완료! 기존 이력서 분석을 통해 항목을 자동으로 채웠습니다. 내용을 확인하고 필요시 수정해 주세요."
-            )
-            Spacer(modifier = Modifier.height(32.dp))
+            if (wasPrefilledFromPdf) {
+                InfoBanner(
+                    text = "AI 분석 완료! 기존 이력서 분석을 통해 항목을 자동으로 채웠습니다. 내용을 확인하고 필요시 수정해 주세요."
+                )
+                Spacer(modifier = Modifier.height(32.dp))
+            }
 
             ResumeFormatSection(
                 resumeFormat = resumeFormat,
-                onResumeFormatChange = { resumeFormat = it },
+                onResumeFormatChange = { viewModel.setResumeFormat(it) },
                 onFormatFileSelect = onFormatFileSelect
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             TargetRoleSection(
                 targetRole = targetRole,
-                onTargetRoleChange = { targetRole = it },
+                onTargetRoleChange = { viewModel.setTargetRole(it) },
                 sloganFocusRequester = sloganFocusRequester
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             SloganSection(
                 slogan = slogan,
-                onSloganChange = { slogan = it },
+                onSloganChange = { viewModel.setSlogan(it) },
                 sloganFocusRequester = sloganFocusRequester
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             StrengthKeywordsSection(
                 strengthKeywords = strengthKeywords,
-                onRemoveKeyword = { strengthKeywords.remove(it) },
+                onRemoveKeyword = { viewModel.removeStrengthKeyword(it) },
                 onAddKeywordClick = { showAddKeyword = true },
                 showAddKeyword = showAddKeyword,
                 newKeyword = newKeyword,
                 onNewKeywordChange = { newKeyword = it },
                 onAddKeyword = {
                     if (newKeyword.isNotBlank()) {
-                        strengthKeywords.add(newKeyword.trim())
+                        viewModel.addStrengthKeyword(newKeyword.trim())
                         newKeyword = ""
                         showAddKeyword = false
                     }
@@ -156,27 +158,27 @@ fun ResumeDetailInputScreen(
 
             ProjectHistorySection(
                 projectHistoryItems = projectHistoryItems,
-                onRemoveItem = { projectHistoryItems.removeAll { i -> i.id == it.id } },
+                onRemoveItem = { viewModel.removeProjectHistoryItem(it) },
                 onAddClick = { showAddProjectDialog = true }
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             CollaborationStyleSection(
                 collaborationStyle = collaborationStyle,
-                onCollaborationStyleChange = { collaborationStyle = it }
+                onCollaborationStyleChange = { viewModel.setCollaborationStyle(it) }
             )
             Spacer(modifier = Modifier.height(24.dp))
 
             TechStackSection(
                 techStacks = techStacks,
-                onRemoveTechStack = { techStacks.remove(it) },
+                onRemoveTechStack = { viewModel.removeTechStack(it) },
                 onAddTechStackClick = { showAddTechStack = true },
                 showAddTechStack = showAddTechStack,
                 newTechStackName = newTechStackName,
                 onNewTechStackNameChange = { newTechStackName = it },
                 onAddTechStack = {
                     if (newTechStackName.isNotBlank()) {
-                        techStacks.add(newTechStackName.trim())
+                        viewModel.addTechStack(newTechStackName.trim())
                         newTechStackName = ""
                         showAddTechStack = false
                     }
@@ -188,13 +190,13 @@ fun ResumeDetailInputScreen(
 
             FutureGoalsSection(
                 futureGoals = futureGoals,
-                onFutureGoalsChange = { futureGoals = it }
+                onFutureGoalsChange = { viewModel.setFutureGoals(it) }
             )
             Spacer(modifier = Modifier.height(32.dp))
 
             ExtraInfoSection(
                 extraItems = extraItems,
-                onRemoveItem = { extraItems.removeAll { i -> i.id == it.id } },
+                onRemoveItem = { viewModel.removeExtraItem(it) },
                 onAddClick = { showAddInfoDialog = true }
             )
 

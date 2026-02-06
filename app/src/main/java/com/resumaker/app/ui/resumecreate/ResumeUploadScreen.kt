@@ -1,5 +1,8 @@
 package com.resumaker.app.ui.resumecreate
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,15 +26,23 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,6 +52,8 @@ import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.progress.StepProgressBar
 import com.resumaker.app.ui.theme.ResumakerTheme
+import org.koin.androidx.compose.koinViewModel
+import java.io.File
 
 private val PrimaryBlue = Color(0xFF2161EE)
 private val UploadAreaBackground = Color(0xFFF8FAFC)
@@ -50,13 +63,31 @@ private val UploadedCardBackground = Color(0xFFF1F5F9)
 @Composable
 fun ResumeUploadScreen(
     onBackClick: () -> Unit,
-    onFileSelect: () -> Unit,
     onSkip: () -> Unit,
     onNext: () -> Unit,
-    onRemoveUpload: (() -> Unit)? = null,
-    uploadedFileName: String? = null
+    viewModel: ResumeUploadViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
+    val uploadedFile by viewModel.uploadedFile.collectAsState()
+    val isUploading by viewModel.isUploading.collectAsState()
+    val uploadError by viewModel.uploadError.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.setUploadedFile(uriToTempFile(context, it)) }
+    }
+
+    LaunchedEffect(uploadError) {
+        uploadError?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearError()
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Row(
                 modifier = Modifier
@@ -77,13 +108,12 @@ fun ResumeUploadScreen(
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
-                // 상단 바 오른쪽 정렬을 위해 투명 버튼 또는 Spacer (타이틀 중앙 느낌 유지)
                 Spacer(modifier = Modifier.size(48.dp))
             }
         },
         bottomBar = {
             Column(modifier = Modifier.padding(20.dp)) {
-                if (uploadedFileName == null) {
+                if (uploadedFile == null) {
                     Text(
                         text = "건너뛰면 직접 모든 정보를 직접 입력하게 됩니다.",
                         modifier = Modifier.fillMaxWidth(),
@@ -106,9 +136,15 @@ fun ResumeUploadScreen(
                     }
                 } else {
                     PrimaryButton(
-                        text = "다음 단계",
-                        onClick = onNext,
-                        modifier = Modifier.fillMaxWidth()
+                        text = if (isUploading) "업로드 중..." else "다음 단계",
+                        onClick = {
+                            viewModel.submitPdfAndNavigate(
+                                onParseSuccess = onNext,
+                                onNoFile = onNext
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isUploading
                     )
                 }
             }
@@ -171,7 +207,7 @@ fun ResumeUploadScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
-                        onClick = onFileSelect,
+                        onClick = { filePickerLauncher.launch("application/pdf") },
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -186,7 +222,7 @@ fun ResumeUploadScreen(
                 }
             }
 
-            if (uploadedFileName != null) {
+            if (uploadedFile != null) {
                 Spacer(modifier = Modifier.height(24.dp))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -206,22 +242,26 @@ fun ResumeUploadScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                uploadedFileName,
+                                uploadedFile?.name ?: "",
                                 fontWeight = FontWeight.Medium,
                                 fontSize = 14.sp
                             )
                             Text(
-                                "2.4MB • 2026.02 업로드",
+                                "2026.02 업로드",
                                 fontSize = 12.sp,
                                 color = Color.Gray
                             )
                         }
-                        IconButton(onClick = { onRemoveUpload?.invoke() }) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = "삭제",
-                                modifier = Modifier.size(20.dp)
-                            )
+                        if (isUploading) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp))
+                        } else {
+                            IconButton(onClick = { viewModel.removeUploadedFile() }) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "삭제",
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -232,31 +272,22 @@ fun ResumeUploadScreen(
     }
 }
 
+private fun uriToTempFile(context: android.content.Context, uri: Uri): File {
+    val tempFile = File.createTempFile("resume_", ".pdf", context.cacheDir)
+    context.contentResolver.openInputStream(uri)?.use { input ->
+        tempFile.outputStream().use { output -> input.copyTo(output) }
+    }
+    return tempFile
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun ResumeUploadScreenPreview() {
     ResumakerTheme {
         ResumeUploadScreen(
             onBackClick = { },
-            onFileSelect = { },
             onSkip = { },
-            onNext = { },
-            uploadedFileName = null
-        )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ResumeUploadScreenWithFilePreview() {
-    ResumakerTheme {
-        ResumeUploadScreen(
-            onBackClick = { },
-            onFileSelect = { },
-            onSkip = { },
-            onNext = { },
-            onRemoveUpload = { },
-            uploadedFileName = "이력서_홍길동.pdf"
+            onNext = { }
         )
     }
 }

@@ -163,11 +163,8 @@ fun ResumakerApp(
         composable(Routes.NewResume) {
             ResumeUploadScreen(
                 onBackClick = { navController.popBackStack() },
-                onFileSelect = { },
                 onSkip = { navController.navigate(Routes.NewResumeStep2) },
-                onNext = { navController.navigate(Routes.NewResumeStep2) },
-                onRemoveUpload = { },
-                uploadedFileName = null
+                onNext = { navController.navigate(Routes.NewResumeStep2) }
             )
         }
 

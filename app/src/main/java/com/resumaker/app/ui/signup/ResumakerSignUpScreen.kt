@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +15,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.resumaker.app.component.appbar.ResumakerTopBar
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
 import com.resumaker.app.component.input.TermCheckbox
@@ -38,22 +38,7 @@ fun ResumakerSignUpScreen(
             .verticalScroll(rememberScrollState()) // 입력 항목이 많아 스크롤 추가
     ) {
         // --- 1. 상단 바 ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp)
-        ) {
-            IconButton(onClick = onBackClick, modifier = Modifier.align(Alignment.CenterStart)) {
-                Icon(Icons.Default.ArrowBackIosNew, contentDescription = "뒤로가기", modifier = Modifier.size(20.dp))
-            }
-            Text(
-                "Resumaker",
-                modifier = Modifier.align(Alignment.Center),
-                color = Color(0xFF2161EE),
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-        }
+        ResumakerTopBar(onBackClick = onBackClick)
 
         Spacer(modifier = Modifier.height(24.dp))
 

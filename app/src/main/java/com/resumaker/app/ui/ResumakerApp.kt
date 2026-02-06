@@ -188,7 +188,7 @@ fun ResumakerApp(
         composable(Routes.NewResumeStep4) {
             ResumeCompletionScreen(
                 onBackClick = { navController.popBackStack() },
-                onEditClick = { navController.navigate(Routes.NewResumeStep2) },
+                onEditClick = { navController.navigate(Routes.ResumeEdit) },
                 onSaveClick = { },
                 onCloseClick = { navController.navigate(Routes.Home) { popUpTo(Routes.Home) { inclusive = true } } }
             )

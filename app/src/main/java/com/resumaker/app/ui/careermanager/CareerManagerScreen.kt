@@ -1,9 +1,7 @@
 package com.resumaker.app.ui.careermanager
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,20 +10,20 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.appbar.ResumakerTopBar
+import com.resumaker.app.component.bottombar.ResumakerBottomBar
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.card.PersonaCard
 import com.resumaker.app.component.card.ResumeCard
 import com.resumaker.app.component.section.SectionHeader
 import com.resumaker.app.model.Persona
 import com.resumaker.app.model.Resume
+import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.theme.ResumakerTheme
 
 @Composable
@@ -35,9 +33,11 @@ fun CareerManagerScreen(
     onViewAllResumes: () -> Unit,
     onViewAllPersonas: () -> Unit,
     onCreateNewResume: () -> Unit,
-    onMyPageClick: () -> Unit = {}
+    onMyPageClick: () -> Unit = {},
+    onNavigate: (String) -> Unit = {}
 ) {
     Scaffold(
+        containerColor = Color.Transparent,
         topBar = {
             ResumakerTopBar(
                 showBackButton = false,
@@ -45,10 +45,16 @@ fun CareerManagerScreen(
             )
         },
         bottomBar = {
-            Box(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 PrimaryButton(
                     text = "+ 새 이력서 작성하기",
-                    onClick = onCreateNewResume
+                    onClick = onCreateNewResume,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp),
+                    showShadow = true
+                )
+                ResumakerBottomBar(
+                    currentRoute = Routes.Home,
+                    onNavigate = onNavigate
                 )
             }
         }
@@ -56,20 +62,15 @@ fun CareerManagerScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 20.dp)
+                .background(Color(0xFFF8FAFC))
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = 20.dp,
+                    end = 20.dp
+                )
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                TextButton(onClick = onMyPageClick) {
-                    Text(text = "마이페이지", fontSize = 14.sp)
-                }
-            }
 
             SectionHeader(title = "내 이력서", onSeeAllClick = onViewAllResumes)
             Spacer(modifier = Modifier.height(16.dp))
@@ -91,7 +92,7 @@ fun CareerManagerScreen(
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(200.dp))
         }
     }
 }

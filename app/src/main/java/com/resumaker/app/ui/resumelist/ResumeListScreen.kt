@@ -29,8 +29,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.appbar.ResumeListTopBar
+import com.resumaker.app.component.bottombar.ResumakerBottomBar
 import com.resumaker.app.component.card.ResumeDetailCard
 import com.resumaker.app.model.Resume
+import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.theme.ResumakerTheme
 
 private val ScreenBackground = Color(0xFFF8FAFC)
@@ -46,11 +48,18 @@ fun ResumeListScreen(
     onPdfDownloadClick: (Resume) -> Unit,
     onRenameClick: (Resume) -> Unit,
     onDeleteClick: (Resume) -> Unit,
-    onAddNewClick: () -> Unit
+    onAddNewClick: () -> Unit,
+    onNavigate: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             ResumeListTopBar(onBackClick = onBackClick, onSearchClick = onSearchClick)
+        },
+        bottomBar = {
+            ResumakerBottomBar(
+                currentRoute = Routes.AllResumes,
+                onNavigate = onNavigate
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -99,7 +108,7 @@ fun ResumeListScreen(
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(start = 20.dp, top = 0.dp, end = 20.dp, bottom = 80.dp),
+                contentPadding = PaddingValues(start = 20.dp, top = 0.dp, end = 20.dp, bottom = 160.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(resumeList) { resume ->

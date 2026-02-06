@@ -27,7 +27,8 @@ fun PrimaryButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     backgroundColor: Color = Color(0xFF2161EE),
-    contentColor: Color = Color.White
+    contentColor: Color = Color.White,
+    showShadow: Boolean = false
 ) {
     Button(
         onClick = onClick,
@@ -39,7 +40,24 @@ fun PrimaryButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor,
             contentColor = contentColor
-        )
+        ),
+        elevation = if (showShadow) {
+            ButtonDefaults.buttonElevation(
+                defaultElevation = 6.dp,
+                pressedElevation = 3.dp,
+                focusedElevation = 6.dp,
+                hoveredElevation = 6.dp,
+                disabledElevation = 0.dp
+            )
+        } else {
+            ButtonDefaults.buttonElevation(
+                defaultElevation = 0.dp,
+                pressedElevation = 0.dp,
+                focusedElevation = 0.dp,
+                hoveredElevation = 0.dp,
+                disabledElevation = 0.dp
+            )
+        }
     ) {
         Text(text = text, fontSize = 16.sp, fontWeight = FontWeight.Bold)
     }

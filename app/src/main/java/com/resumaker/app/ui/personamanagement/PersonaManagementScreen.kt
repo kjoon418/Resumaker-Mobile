@@ -23,8 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.appbar.PersonaTopBar
+import com.resumaker.app.component.bottombar.ResumakerBottomBar
 import com.resumaker.app.component.card.PersonaManagementCard
 import com.resumaker.app.model.Persona
+import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.theme.ResumakerTheme
 
 private val ScreenBackground = Color(0xFFF8FAFC)
@@ -37,11 +39,18 @@ fun PersonaManagementScreen(
     onSearchClick: () -> Unit,
     onAddClick: () -> Unit,
     onEditClick: (Persona) -> Unit,
-    onDeleteClick: (Persona) -> Unit
+    onDeleteClick: (Persona) -> Unit,
+    onNavigate: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             PersonaTopBar(onBackClick = onBackClick, onSearchClick = onSearchClick)
+        },
+        bottomBar = {
+            ResumakerBottomBar(
+                currentRoute = Routes.AllPersonas,
+                onNavigate = onNavigate
+            )
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -75,7 +84,7 @@ fun PersonaManagementScreen(
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
-                contentPadding = PaddingValues(bottom = 80.dp)
+                contentPadding = PaddingValues(bottom = 160.dp)
             ) {
                 items(personaList) { persona ->
                     PersonaManagementCard(

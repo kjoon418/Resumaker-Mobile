@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.resumaker.app.component.appbar.MyPageTopBar
+import com.resumaker.app.component.bottombar.ResumakerBottomBar
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.card.InfoSectionCard
 import com.resumaker.app.component.section.AccountManagementSection
@@ -29,6 +30,7 @@ import com.resumaker.app.model.Certification
 import com.resumaker.app.model.Education
 import com.resumaker.app.model.Experience
 import com.resumaker.app.model.UserProfile
+import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.theme.ResumakerTheme
 
 private val ScreenBackground = Color(0xFFF8FAFC)
@@ -49,25 +51,30 @@ fun MyPageScreen(
     onAddCertification: () -> Unit = {},
     onAddAward: () -> Unit = {},
     onLogout: () -> Unit = {},
-    onWithdraw: () -> Unit = {}
+    onWithdraw: () -> Unit = {},
+    onNavigate: (String) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             MyPageTopBar(onBackClick = onBackClick)
         },
         bottomBar = {
-            if (hasChanges) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(ScreenBackground)
-                        .padding(20.dp)
-                ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(ScreenBackground)
+            ) {
+                if (hasChanges) {
                     PrimaryButton(
                         text = "저장",
-                        onClick = onSaveClick
+                        onClick = onSaveClick,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
                     )
                 }
+                ResumakerBottomBar(
+                    currentRoute = Routes.MyPage,
+                    onNavigate = onNavigate
+                )
             }
         },
         containerColor = ScreenBackground

@@ -74,7 +74,13 @@ fun ResumakerApp(
                 onViewAllResumes = { navController.navigate(Routes.AllResumes) },
                 onViewAllPersonas = { navController.navigate(Routes.AllPersonas) },
                 onCreateNewResume = { navController.navigate(Routes.NewResume) },
-                onMyPageClick = { navController.navigate(Routes.MyPage) }
+                onMyPageClick = { navController.navigate(Routes.MyPage) },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Routes.Home) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
@@ -86,7 +92,13 @@ fun ResumakerApp(
                 certifications = sampleCertifications,
                 awards = sampleAwards,
                 onBackClick = { navController.popBackStack() },
-                onSaveClick = { }
+                onSaveClick = { },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Routes.Home) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
@@ -99,7 +111,13 @@ fun ResumakerApp(
                 onPdfDownloadClick = { },
                 onRenameClick = { },
                 onDeleteClick = { },
-                onAddNewClick = { navController.navigate(Routes.NewResume) }
+                onAddNewClick = { navController.navigate(Routes.NewResume) },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Routes.Home) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
@@ -110,7 +128,13 @@ fun ResumakerApp(
                 onSearchClick = { },
                 onAddClick = { },
                 onEditClick = { },
-                onDeleteClick = { }
+                onDeleteClick = { },
+                onNavigate = { route ->
+                    navController.navigate(route) {
+                        popUpTo(Routes.Home) { inclusive = false }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 

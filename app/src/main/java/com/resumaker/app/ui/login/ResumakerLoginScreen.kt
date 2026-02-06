@@ -3,8 +3,8 @@ package com.resumaker.app.ui.login
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,16 +27,25 @@ import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
 import com.resumaker.app.component.section.LoginHeader
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ResumakerLoginScreen(
     onLoginSuccess: () -> Unit = {},
-    onNavigateToSignUp: () -> Unit = {}
+    onNavigateToSignUp: () -> Unit = {},
+    viewModel: LoginViewModel = koinViewModel()
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
     var passwordVisible by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
+
+    LaunchedEffect(Unit) {
+        viewModel.loginSuccessEvent.collect { onLoginSuccess() }
+    }
 
     Column(
         modifier = Modifier
@@ -45,15 +54,13 @@ fun ResumakerLoginScreen(
             .padding(top = 60.dp, bottom = 24.dp)
             .verticalScroll(rememberScrollState())
     ) {
-        // --- 1. 헤더 섹션 ---
         LoginHeader()
 
-        Spacer(modifier = Modifier.height(56.dp)) // 소셜 로그인이 빠져서 간격을 조금 더 넓혔습니다.
+        Spacer(modifier = Modifier.height(56.dp))
 
-        // --- 2. 입력 섹션 ---
         PrimaryTextField(
             value = email,
-            onValueChange = { email = it },
+            onValueChange = viewModel::updateEmail,
             label = "이메일",
             placeholder = "example@email.com",
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray) },
@@ -65,13 +72,13 @@ fun ResumakerLoginScreen(
 
         PrimaryTextField(
             value = password,
-            onValueChange = { password = it },
+            onValueChange = viewModel::updatePassword,
             label = "비밀번호",
             placeholder = "비밀번호를 입력하세요",
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { onLoginSuccess() }),
+            keyboardActions = KeyboardActions(onDone = { viewModel.login() }),
             trailingIcon = {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
@@ -83,6 +90,15 @@ fun ResumakerLoginScreen(
             }
         )
 
+        if (errorMessage != null) {
+            Text(
+                text = errorMessage!!,
+                color = Color(0xFFB91C1C),
+                fontSize = 13.sp,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+        }
+
         TextButton(
             onClick = { /* 비밀번호 찾기 이동 */ },
             modifier = Modifier.align(Alignment.End),
@@ -93,16 +109,14 @@ fun ResumakerLoginScreen(
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // --- 3. 로그인 버튼 ---
         PrimaryButton(
-            text = "로그인",
-            onClick = { onLoginSuccess() }
+            text = if (isLoading) "로그인 중…" else "로그인",
+            onClick = { viewModel.login() },
+            enabled = !isLoading
         )
 
-        // 키보드 올라왔을 때도 레이아웃이 찌그러지지 않도록 스크롤 사용. weight 대신 고정 여백.
         Spacer(modifier = Modifier.height(40.dp))
 
-        // --- 4. 하단 회원가입 안내 ---
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.Center,

@@ -1,0 +1,9 @@
+## Copy this file to local.properties and set your values.
+## local.properties is gitignored and must not be committed.
+##
+## SDK path (required by Android)
+# sdk.dir=C\:\\Users\\youruser\\AppData\\Local\\Android\\Sdk
+##
+## API base URL (optional, used by BuildConfig.API_BASE_URL)
+## Trailing slash is recommended (e.g. https://api.example.com/)
+api.base.url=https://your-api-server.com/

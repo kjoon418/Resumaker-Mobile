@@ -28,11 +28,7 @@ import com.resumaker.app.component.appbar.ResumakerTopBar
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
 import com.resumaker.app.component.input.TermCheckbox
-import com.resumaker.app.data.auth.AuthRepository
-import com.resumaker.app.data.auth.RegisterParams
-import com.resumaker.app.data.remote.ApiResult
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
+import org.koin.androidx.compose.koinViewModel
 
 private const val STEP_1 = 1
 private const val STEP_2 = 2
@@ -44,38 +40,29 @@ private val GENDER_OPTIONS = listOf(
     "기타"
 )
 
-/** UI 성별 표시 → API 값 (M/F/O) */
-private fun genderToApi(genderDisplay: String): String = when (genderDisplay) {
-    "남성" -> "M"
-    "여성" -> "F"
-    "기타" -> "O"
-    else -> "O"
-}
-
 @Composable
 fun ResumakerSignUpScreen(
     onBackClick: () -> Unit,
     onLoginClick: () -> Unit,
-    authRepository: AuthRepository = koinInject()
+    viewModel: SignUpViewModel = koinViewModel()
 ) {
-    var currentStep by remember { mutableIntStateOf(STEP_1) }
-    val scope = rememberCoroutineScope()
+    val currentStep by viewModel.currentStep.collectAsState()
+    val name by viewModel.name.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val isTermAgreed by viewModel.isTermAgreed.collectAsState()
+    val age by viewModel.age.collectAsState()
+    val gender by viewModel.gender.collectAsState()
+    val occupation by viewModel.occupation.collectAsState()
+    val contact by viewModel.contact.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    val isRegistering by viewModel.isRegistering.collectAsState()
 
-    // 1단계: 이름, 이메일, 비밀번호
-    var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var isTermAgreed by remember { mutableStateOf(false) }
-
-    // 2단계: 나이, 성별, 직업, 연락처
-    var age by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf(GENDER_OPTIONS[0]) }
     var genderExpanded by remember { mutableStateOf(false) }
-    var occupation by remember { mutableStateOf("") }
-    var contact by remember { mutableStateOf("") }
 
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var isRegistering by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        viewModel.signUpSuccessEvent.collect { onLoginClick() }
+    }
 
     Column(
         modifier = Modifier
@@ -87,7 +74,6 @@ fun ResumakerSignUpScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 단계 표시 (1/2, 2/2)
         Text(
             text = "${currentStep}/2",
             fontSize = 13.sp,
@@ -99,52 +85,31 @@ fun ResumakerSignUpScreen(
         when (currentStep) {
             STEP_1 -> Step1Content(
                 name = name,
-                onNameChange = { name = it },
+                onNameChange = viewModel::updateName,
                 email = email,
-                onEmailChange = { email = it },
+                onEmailChange = viewModel::updateEmail,
                 password = password,
-                onPasswordChange = { password = it },
+                onPasswordChange = viewModel::updatePassword,
                 isTermAgreed = isTermAgreed,
-                onTermAgreedChange = { isTermAgreed = it },
-                onNextClick = { currentStep = STEP_2 },
+                onTermAgreedChange = viewModel::updateTermAgreed,
+                onNextClick = viewModel::goToNextStep,
                 onLoginClick = onLoginClick,
                 canProceed = name.isNotBlank() && email.isNotBlank() && password.length >= 8 && isTermAgreed
             )
 
             STEP_2 -> Step2Content(
                 age = age,
-                onAgeChange = { age = it },
+                onAgeChange = viewModel::updateAge,
                 gender = gender,
-                onGenderChange = { gender = it },
+                onGenderChange = viewModel::updateGender,
                 genderExpanded = genderExpanded,
                 onGenderExpandedChange = { genderExpanded = it },
                 occupation = occupation,
-                onOccupationChange = { occupation = it },
+                onOccupationChange = viewModel::updateOccupation,
                 contact = contact,
-                onContactChange = { contact = it },
-                onBackClick = { currentStep = STEP_1 },
-                onSubmitClick = {
-                    errorMessage = null
-                    scope.launch {
-                        isRegistering = true
-                        val params = RegisterParams(
-                            username = email.trim(),
-                            email = email.trim(),
-                            password = password,
-                            name = name.trim(),
-                            age = age.toIntOrNull() ?: 0,
-                            gender = genderToApi(gender),
-                            job = occupation.trim(),
-                            phoneNumber = contact.trim()
-                        )
-                        when (val result = authRepository.register(params)) {
-                            is ApiResult.Success -> onLoginClick()
-                            is ApiResult.Error -> errorMessage = result.message
-                            is ApiResult.NetworkError -> errorMessage = "네트워크 연결을 확인해 주세요."
-                        }
-                        isRegistering = false
-                    }
-                },
+                onContactChange = viewModel::updateContact,
+                onBackClick = viewModel::goToPrevStep,
+                onSubmitClick = viewModel::register,
                 onLoginClick = onLoginClick,
                 canSubmit = age.isNotBlank() && gender != GENDER_OPTIONS[0] && occupation.isNotBlank() && contact.isNotBlank(),
                 errorMessage = errorMessage,

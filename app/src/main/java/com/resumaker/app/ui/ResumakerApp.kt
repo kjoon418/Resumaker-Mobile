@@ -80,6 +80,11 @@ fun ResumakerApp(
                         popUpTo(Routes.Home) { inclusive = false }
                         launchSingleTop = true
                     }
+                },
+                onBackClick = {
+                    navController.navigate(Routes.Login) {
+                        popUpTo(Routes.Login) { inclusive = true }
+                    }
                 }
             )
         }

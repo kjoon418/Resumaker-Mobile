@@ -1,5 +1,6 @@
 package com.resumaker.app.ui.careermanager
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -39,8 +40,10 @@ fun CareerManagerScreen(
     onViewAllPersonas: () -> Unit,
     onCreateNewResume: () -> Unit,
     onMyPageClick: () -> Unit = {},
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
+    BackHandler(onBack = onBackClick)
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {

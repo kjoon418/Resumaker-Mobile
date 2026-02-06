@@ -66,6 +66,12 @@ private data class ExtraInfoItem(
     val content: String
 )
 
+private data class ProjectHistoryItem(
+    val id: String,
+    val projectName: String,
+    val keyTasks: String
+)
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ResumeDetailInputScreen(
@@ -76,13 +82,24 @@ fun ResumeDetailInputScreen(
     var resumeFormat by remember { mutableStateOf("") }
     var targetRole by remember { mutableStateOf("") }
     var slogan by remember { mutableStateOf("") }
+    val strengthKeywords = remember { mutableStateListOf<String>() }
+    val projectHistoryItems = remember { mutableStateListOf<ProjectHistoryItem>() }
+    var collaborationStyle by remember { mutableStateOf("") }
     val techStacks = remember { mutableStateListOf("Java", "Spring Boot") }
+    var futureGoals by remember { mutableStateOf("") }
     val extraItems = remember { mutableStateListOf<ExtraInfoItem>() }
 
     var showAddInfoDialog by remember { mutableStateOf(false) }
     var addInfoStep by remember { mutableStateOf(0) }
     var newInfoTitle by remember { mutableStateOf("") }
     var newInfoContent by remember { mutableStateOf("") }
+
+    var showAddProjectDialog by remember { mutableStateOf(false) }
+    var newProjectName by remember { mutableStateOf("") }
+    var newProjectKeyTasks by remember { mutableStateOf("") }
+
+    var newKeyword by remember { mutableStateOf("") }
+    var showAddKeyword by remember { mutableStateOf(false) }
 
     // TODO: 서버 API를 통해 1단계에서 분석된 데이터를 가져와 상태를 업데이트하는 로직 구현 필요
     // LaunchedEffect(Unit) { fetchAnalyzedData() }
@@ -220,7 +237,166 @@ fun ResumeDetailInputScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                "주력 기술 스택",
+                "본인의 강점(키워드)",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                strengthKeywords.forEach { keyword ->
+                    SuggestionChip(
+                        onClick = { strengthKeywords.remove(keyword) },
+                        label = { Text(keyword) },
+                        shape = RoundedCornerShape(20.dp)
+                    )
+                }
+                InputChip(
+                    selected = false,
+                    onClick = { showAddKeyword = true },
+                    label = { Text("+ 키워드 추가") }
+                )
+            }
+            if (showAddKeyword) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = newKeyword,
+                        onValueChange = { newKeyword = it },
+                        placeholder = { Text("키워드 입력", color = Color.LightGray, fontSize = 14.sp) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 48.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryBlue,
+                            unfocusedBorderColor = Color(0xFFE0E0E0),
+                            cursorColor = PrimaryBlue
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(onClick = {
+                        if (newKeyword.isNotBlank()) {
+                            strengthKeywords.add(newKeyword.trim())
+                            newKeyword = ""
+                            showAddKeyword = false
+                        }
+                    }) {
+                        Text("추가", color = PrimaryBlue)
+                    }
+                    TextButton(onClick = { showAddKeyword = false; newKeyword = "" }) {
+                        Text("취소", color = Color.Gray)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "프로젝트 이력(핵심 과업)",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            projectHistoryItems.forEach { item ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = item.projectName,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                        if (item.keyTasks.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = item.keyTasks,
+                                fontSize = 13.sp,
+                                color = Color.Gray
+                            )
+                        }
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(
+                                onClick = { projectHistoryItems.removeAll { it.id == item.id } },
+                                modifier = Modifier.size(40.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "삭제",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = Color.Gray
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            OutlinedButton(
+                onClick = {
+                    showAddProjectDialog = true
+                    newProjectName = ""
+                    newProjectKeyTasks = ""
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, Color(0xFFE2E8F0))
+            ) {
+                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("프로젝트 추가", color = Color.Gray, fontSize = 15.sp)
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "선호하는 협업 방식",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            OutlinedTextField(
+                value = collaborationStyle,
+                onValueChange = { collaborationStyle = it },
+                placeholder = {
+                    Text(
+                        "예: 애자일 스프린트, 주간 동기화, 문서 공유 중심 등",
+                        color = Color.LightGray,
+                        fontSize = 14.sp
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp),
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryBlue,
+                    unfocusedBorderColor = Color(0xFFE0E0E0),
+                    cursorColor = PrimaryBlue
+                )
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "기술 스택",
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -242,6 +418,35 @@ fun ResumeDetailInputScreen(
                     label = { Text("+ 추가") }
                 )
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                "미래 지향점",
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            OutlinedTextField(
+                value = futureGoals,
+                onValueChange = { futureGoals = it },
+                placeholder = {
+                    Text(
+                        "앞으로의 목표, 성장 방향, 관심 분야 등을 입력하세요.",
+                        color = Color.LightGray,
+                        fontSize = 14.sp
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp),
+                shape = RoundedCornerShape(12.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryBlue,
+                    unfocusedBorderColor = Color(0xFFE0E0E0),
+                    cursorColor = PrimaryBlue
+                )
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -425,6 +630,95 @@ fun ResumeDetailInputScreen(
                                     ) {
                                         Text("추가")
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (showAddProjectDialog) {
+                Dialog(onDismissRequest = { showAddProjectDialog = false }) {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color.White
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "프로젝트 이력 추가",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            OutlinedTextField(
+                                value = newProjectName,
+                                onValueChange = { newProjectName = it },
+                                placeholder = { Text("프로젝트명", color = Color.LightGray) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 12.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryBlue,
+                                    unfocusedBorderColor = Color(0xFFE0E0E0),
+                                    cursorColor = PrimaryBlue
+                                )
+                            )
+                            OutlinedTextField(
+                                value = newProjectKeyTasks,
+                                onValueChange = { newProjectKeyTasks = it },
+                                placeholder = {
+                                    Text(
+                                        "핵심 과업 및 성과",
+                                        color = Color.LightGray
+                                    )
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .heightIn(min = 80.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryBlue,
+                                    unfocusedBorderColor = Color(0xFFE0E0E0),
+                                    cursorColor = PrimaryBlue
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                TextButton(
+                                    onClick = { showAddProjectDialog = false },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("취소", color = Color.Gray)
+                                }
+                                Button(
+                                    onClick = {
+                                        if (newProjectName.isNotBlank()) {
+                                            projectHistoryItems.add(
+                                                ProjectHistoryItem(
+                                                    id = "proj-${System.currentTimeMillis()}",
+                                                    projectName = newProjectName.trim(),
+                                                    keyTasks = newProjectKeyTasks.trim()
+                                                )
+                                            )
+                                            showAddProjectDialog = false
+                                            newProjectName = ""
+                                            newProjectKeyTasks = ""
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = PrimaryBlue
+                                    )
+                                ) {
+                                    Text("추가")
                                 }
                             }
                         }

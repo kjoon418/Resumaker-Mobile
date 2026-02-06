@@ -34,4 +34,7 @@ object Routes {
 
     /** 이력서 편집 (기존 이력서 수정) */
     const val ResumeEdit = "resumes/edit"
+
+    /** 가상 면접 진행 */
+    const val Interview = "interview"
 }

@@ -31,6 +31,7 @@ import com.resumaker.app.ui.resumeedit.ResumeEditScreen
 import com.resumaker.app.ui.resumecreate.ResumeGeneratingScreen
 import com.resumaker.app.ui.resumecreate.ResumeUploadScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
+import com.resumaker.app.ui.interview.InterviewScreen
 
 @Composable
 fun ResumakerApp(
@@ -125,7 +126,14 @@ fun ResumakerApp(
                 onBackClick = { navController.popBackStack() },
                 onSaveClick = { },
                 onPdfExportClick = { },
-                onInterviewClick = { }
+                onInterviewClick = { navController.navigate(Routes.Interview) }
+            )
+        }
+
+        composable(Routes.Interview) {
+            InterviewScreen(
+                onBackClick = { navController.popBackStack() },
+                onExit = { navController.popBackStack() }
             )
         }
 

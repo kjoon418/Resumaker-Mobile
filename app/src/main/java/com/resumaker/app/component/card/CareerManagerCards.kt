@@ -1,11 +1,13 @@
 package com.resumaker.app.component.card
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -29,13 +31,17 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.resumaker.app.R
 import com.resumaker.app.component.button.SecondaryActionButton
 import com.resumaker.app.model.Persona
 import com.resumaker.app.model.Resume
@@ -60,6 +66,7 @@ private fun iconForResumeType(iconType: String): ImageVector = when (iconType) {
 @Composable
 fun ResumeCard(
     resume: Resume,
+    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
@@ -68,11 +75,14 @@ fun ResumeCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = CardIconBackground
-            ) {}
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                icon()
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -100,6 +110,7 @@ fun ResumeCard(
 @Composable
 fun PersonaCard(
     persona: Persona,
+    icon: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null
 ) {
@@ -108,11 +119,14 @@ fun PersonaCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Surface(
-                modifier = Modifier.size(48.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = CardIconBackground
-            ) {}
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                icon()
+            }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
@@ -154,14 +168,24 @@ fun ResumeDetailCard(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(ListCardIconBackground, RoundedCornerShape(12.dp)),
+                        .clip(RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        iconForResumeType(resume.iconType),
-                        contentDescription = null,
-                        tint = ListCardIconTint
-                    )
+                    if (resume.iconType == "doc") {
+                        Image(
+                            painter = painterResource(R.drawable.dev),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            iconForResumeType(resume.iconType),
+                            contentDescription = null,
+                            modifier = Modifier.size(48.dp),
+                            tint = ListCardIconTint
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -249,7 +273,17 @@ private val previewPersona = Persona(
 @Composable
 private fun ResumeCardPreview() {
     ResumakerTheme {
-        ResumeCard(resume = previewResume)
+        ResumeCard(
+            resume = previewResume,
+                icon = {
+                Image(
+                    painter = painterResource(R.drawable.dev),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
     }
 }
 
@@ -257,7 +291,17 @@ private fun ResumeCardPreview() {
 @Composable
 private fun PersonaCardPreview() {
     ResumakerTheme {
-        PersonaCard(persona = previewPersona)
+        PersonaCard(
+            persona = previewPersona,
+                icon = {
+                Image(
+                    painter = painterResource(R.drawable.warm),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        )
     }
 }
 

@@ -1,5 +1,6 @@
 package com.resumaker.app.ui.careermanager
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,14 +8,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.resumaker.app.R
 import com.resumaker.app.component.appbar.ResumakerTopBar
 import com.resumaker.app.component.bottombar.ResumakerBottomBar
 import com.resumaker.app.component.button.PrimaryButton
@@ -75,7 +80,17 @@ fun CareerManagerScreen(
             SectionHeader(title = "내 이력서", onSeeAllClick = onViewAllResumes)
             Spacer(modifier = Modifier.height(16.dp))
             resumes.take(3).forEach { resume ->
-                ResumeCard(resume = resume)
+                ResumeCard(
+                    resume = resume,
+                    icon = {
+                        Image(
+                            painter = painterResource(R.drawable.dev),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                )
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
@@ -88,7 +103,17 @@ fun CareerManagerScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             personas.take(3).forEach { persona ->
-                PersonaCard(persona = persona)
+                PersonaCard(
+                    persona = persona,
+                    icon = {
+                        Image(
+                            painter = painterResource(R.drawable.warm),
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                )
                 Spacer(modifier = Modifier.height(12.dp))
             }
 

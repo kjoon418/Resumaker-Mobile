@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
@@ -39,7 +38,6 @@ fun CareerManagerScreen(
     onViewAllResumes: () -> Unit,
     onViewAllPersonas: () -> Unit,
     onCreateNewResume: () -> Unit,
-    onMyPageClick: () -> Unit = {},
     onNavigate: (String) -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
@@ -142,8 +140,7 @@ private fun CareerManagerScreenPreview() {
             ),
             onViewAllResumes = { },
             onViewAllPersonas = { },
-            onCreateNewResume = { },
-            onMyPageClick = { }
+            onCreateNewResume = { }
         )
     }
 }

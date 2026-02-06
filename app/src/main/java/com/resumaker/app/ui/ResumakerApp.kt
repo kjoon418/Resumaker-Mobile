@@ -74,7 +74,6 @@ fun ResumakerApp(
                 onViewAllResumes = { navController.navigate(Routes.AllResumes) },
                 onViewAllPersonas = { navController.navigate(Routes.AllPersonas) },
                 onCreateNewResume = { navController.navigate(Routes.NewResume) },
-                onMyPageClick = { navController.navigate(Routes.MyPage) },
                 onNavigate = { route ->
                     navController.navigate(route) {
                         popUpTo(Routes.Home) { inclusive = false }

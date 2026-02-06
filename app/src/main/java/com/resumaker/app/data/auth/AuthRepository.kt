@@ -25,7 +25,7 @@ class AuthRepository(
      * 이메일과 비밀번호로 로그인합니다.
      * 서버 API는 username 필드를 사용하므로, 이메일을 username으로 전달합니다.
      *
-     * @param email 사용자 이메일 (서버에는 username으로 전송)
+     * @param email 사용자 이메일
      * @param password 비밀번호
      * @return [ApiResult.Success] 시 [LoginResult] 반환, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
      */

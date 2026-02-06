@@ -32,6 +32,12 @@ import com.resumaker.app.ui.resumecreate.ResumeGeneratingScreen
 import com.resumaker.app.ui.resumecreate.ResumeUploadScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
 import com.resumaker.app.ui.interview.InterviewScreen
+import com.resumaker.app.ui.mypage.MyPageScreen
+import com.resumaker.app.model.Education
+import com.resumaker.app.model.Experience
+import com.resumaker.app.model.Certification
+import com.resumaker.app.model.Award
+import com.resumaker.app.model.UserProfile
 
 @Composable
 fun ResumakerApp(
@@ -67,7 +73,20 @@ fun ResumakerApp(
                 personas = samplePersonas,
                 onViewAllResumes = { navController.navigate(Routes.AllResumes) },
                 onViewAllPersonas = { navController.navigate(Routes.AllPersonas) },
-                onCreateNewResume = { navController.navigate(Routes.NewResume) }
+                onCreateNewResume = { navController.navigate(Routes.NewResume) },
+                onMyPageClick = { navController.navigate(Routes.MyPage) }
+            )
+        }
+
+        composable(Routes.MyPage) {
+            MyPageScreen(
+                user = sampleUserProfile,
+                educations = sampleEducations,
+                experiences = sampleExperiences,
+                certifications = sampleCertifications,
+                awards = sampleAwards,
+                onBackClick = { navController.popBackStack() },
+                onSaveClick = { }
             )
         }
 
@@ -158,6 +177,45 @@ private val samplePersonas = listOf(
     Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1", "2025.02.05"),
     Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2", "2025.02.03"),
     Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3", "2025.02.01")
+)
+
+private val sampleUserProfile = UserProfile(
+    name = "홍길동",
+    email = "hong@example.com",
+    age = 28,
+    gender = "MALE",
+    job = "프론트엔드 개발자",
+    phoneNumber = "010-1234-5678"
+)
+
+private val sampleEducations = listOf(
+    Education("서울대학교", "컴퓨터공학과", "2014.03 ~ 2018.02", "4.2/4.5")
+)
+
+private val sampleExperiences = listOf(
+    Experience(
+        company = "(주)테크컴퍼니",
+        role = "시니어 프론트엔드 개발자",
+        period = "2022.01 ~ 현재",
+        description = "React 기반 웹 서비스 개발 및 팀 리드. 성능 최적화 및 디자인 시스템 구축.",
+        isCurrent = true
+    ),
+    Experience(
+        company = "이전 회사",
+        role = "주니어 개발자",
+        period = "2018.03 ~ 2021.12",
+        description = "웹 프론트엔드 개발 및 유지보수.",
+        isCurrent = false
+    )
+)
+
+private val sampleCertifications = listOf(
+    Certification("정보처리기사", "한국산업인력공단", "2020.05", "1차 합격"),
+    Certification("TOEIC", "ETS", "2019.03", "920")
+)
+
+private val sampleAwards = listOf(
+    Award("우수 사원상", "연간 성과 평가 우수", "2023", "테크컴퍼니")
 )
 
 @Composable

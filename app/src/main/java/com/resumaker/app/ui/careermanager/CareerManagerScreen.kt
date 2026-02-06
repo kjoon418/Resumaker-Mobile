@@ -2,17 +2,23 @@ package com.resumaker.app.ui.careermanager
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.appbar.ResumakerTopBar
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.card.PersonaCard
@@ -28,7 +34,8 @@ fun CareerManagerScreen(
     personas: List<Persona>,
     onViewAllResumes: () -> Unit,
     onViewAllPersonas: () -> Unit,
-    onCreateNewResume: () -> Unit
+    onCreateNewResume: () -> Unit,
+    onMyPageClick: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -54,6 +61,15 @@ fun CareerManagerScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = onMyPageClick) {
+                    Text(text = "마이페이지", fontSize = 14.sp)
+                }
+            }
 
             SectionHeader(title = "내 이력서", onSeeAllClick = onViewAllResumes)
             Spacer(modifier = Modifier.height(16.dp))
@@ -97,7 +113,8 @@ private fun CareerManagerScreenPreview() {
             ),
             onViewAllResumes = { },
             onViewAllPersonas = { },
-            onCreateNewResume = { }
+            onCreateNewResume = { },
+            onMyPageClick = { }
         )
     }
 }

@@ -37,4 +37,7 @@ object Routes {
 
     /** 가상 면접 진행 */
     const val Interview = "interview"
+
+    /** 마이페이지 (내 정보 조회/수정) */
+    const val MyPage = "mypage"
 }

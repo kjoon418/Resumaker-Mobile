@@ -27,6 +27,7 @@ import com.resumaker.app.ui.personamanagement.PersonaManagementScreen
 import com.resumaker.app.ui.resumelist.ResumeListScreen
 import com.resumaker.app.ui.resumecreate.ResumeCompletionScreen
 import com.resumaker.app.ui.resumecreate.ResumeDetailInputScreen
+import com.resumaker.app.ui.resumeedit.ResumeEditScreen
 import com.resumaker.app.ui.resumecreate.ResumeGeneratingScreen
 import com.resumaker.app.ui.resumecreate.ResumeUploadScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
@@ -74,7 +75,7 @@ fun ResumakerApp(
                 resumeList = sampleResumes,
                 onBackClick = { navController.popBackStack() },
                 onSearchClick = { },
-                onEditClick = { navController.navigate(Routes.NewResume) },
+                onEditClick = { navController.navigate(Routes.ResumeEdit) },
                 onPdfDownloadClick = { },
                 onRenameClick = { },
                 onDeleteClick = { },
@@ -116,6 +117,15 @@ fun ResumakerApp(
             ResumeGeneratingScreen(
                 onBackClick = { navController.popBackStack() },
                 onCompleteClick = { navController.navigate(Routes.NewResumeStep4) }
+            )
+        }
+
+        composable(Routes.ResumeEdit) {
+            ResumeEditScreen(
+                onBackClick = { navController.popBackStack() },
+                onSaveClick = { },
+                onPdfExportClick = { },
+                onInterviewClick = { }
             )
         }
 

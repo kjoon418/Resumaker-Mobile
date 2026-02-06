@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -45,8 +47,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -98,11 +103,16 @@ fun ResumeDetailInputScreen(
     var newProjectName by remember { mutableStateOf("") }
     var newProjectKeyTasks by remember { mutableStateOf("") }
 
-    var showAddTechStackDialog by remember { mutableStateOf(false) }
     var newTechStackName by remember { mutableStateOf("") }
+    var showAddTechStack by remember { mutableStateOf(false) }
 
     var newKeyword by remember { mutableStateOf("") }
     var showAddKeyword by remember { mutableStateOf(false) }
+
+    val sloganFocusRequester = remember { FocusRequester() }
+    val keywordFocusRequester = remember { FocusRequester() }
+    val techStackFocusRequester = remember { FocusRequester() }
+    val projectTitleFocusRequester = remember { FocusRequester() }
 
     // TODO: 서버 API를 통해 1단계에서 분석된 데이터를 가져와 상태를 업데이트하는 로직 구현 필요
     // LaunchedEffect(Unit) { fetchAnalyzedData() }
@@ -205,7 +215,9 @@ fun ResumeDetailInputScreen(
                 value = targetRole,
                 onValueChange = { targetRole = it },
                 label = "전문 분야 및 타겟",
-                placeholder = "예: 시니어 백엔드 엔지니어 / 금융권 도메인"
+                placeholder = "예: 시니어 백엔드 엔지니어 / 금융권 도메인",
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(onNext = { sloganFocusRequester.requestFocus() })
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -227,7 +239,8 @@ fun ResumeDetailInputScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 100.dp),
+                    .heightIn(min = 100.dp)
+                    .focusRequester(sloganFocusRequester),
                 shape = RoundedCornerShape(12.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -263,6 +276,7 @@ fun ResumeDetailInputScreen(
                 )
             }
             if (showAddKeyword) {
+                LaunchedEffect(Unit) { keywordFocusRequester.requestFocus() }
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -274,9 +288,20 @@ fun ResumeDetailInputScreen(
                         placeholder = { Text("키워드 입력", color = Color.LightGray, fontSize = 14.sp) },
                         modifier = Modifier
                             .weight(1f)
-                            .heightIn(min = 48.dp),
+                            .heightIn(min = 48.dp)
+                            .focusRequester(keywordFocusRequester),
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                if (newKeyword.isNotBlank()) {
+                                    strengthKeywords.add(newKeyword.trim())
+                                    newKeyword = ""
+                                    showAddKeyword = false
+                                }
+                            }
+                        ),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = PrimaryBlue,
                             unfocusedBorderColor = Color(0xFFE0E0E0),
@@ -417,9 +442,57 @@ fun ResumeDetailInputScreen(
                 }
                 InputChip(
                     selected = false,
-                    onClick = { showAddTechStackDialog = true },
-                    label = { Text("+ 추가") }
+                    onClick = { showAddTechStack = true },
+                    label = { Text("+ 기술 스택 추가") }
                 )
+            }
+            if (showAddTechStack) {
+                LaunchedEffect(Unit) { techStackFocusRequester.requestFocus() }
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    OutlinedTextField(
+                        value = newTechStackName,
+                        onValueChange = { newTechStackName = it },
+                        placeholder = { Text("기술 스택 입력", color = Color.LightGray, fontSize = 14.sp) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .heightIn(min = 48.dp)
+                            .focusRequester(techStackFocusRequester),
+                        shape = RoundedCornerShape(12.dp),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                if (newTechStackName.isNotBlank()) {
+                                    techStacks.add(newTechStackName.trim())
+                                    newTechStackName = ""
+                                    showAddTechStack = false
+                                }
+                            }
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryBlue,
+                            unfocusedBorderColor = Color(0xFFE0E0E0),
+                            cursorColor = PrimaryBlue
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    TextButton(onClick = {
+                        if (newTechStackName.isNotBlank()) {
+                            techStacks.add(newTechStackName.trim())
+                            newTechStackName = ""
+                            showAddTechStack = false
+                        }
+                    }) {
+                        Text("추가", color = PrimaryBlue)
+                    }
+                    TextButton(onClick = { showAddTechStack = false; newTechStackName = "" }) {
+                        Text("취소", color = Color.Gray)
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -650,6 +723,7 @@ fun ResumeDetailInputScreen(
                             modifier = Modifier.padding(24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            LaunchedEffect(Unit) { projectTitleFocusRequester.requestFocus() }
                             Text(
                                 text = "프로젝트 이력 추가",
                                 fontWeight = FontWeight.Bold,
@@ -662,7 +736,8 @@ fun ResumeDetailInputScreen(
                                 placeholder = { Text("프로젝트명", color = Color.LightGray) },
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(bottom = 12.dp),
+                                    .padding(bottom = 12.dp)
+                                    .focusRequester(projectTitleFocusRequester),
                                 shape = RoundedCornerShape(12.dp),
                                 singleLine = true,
                                 colors = OutlinedTextFieldDefaults.colors(
@@ -714,70 +789,6 @@ fun ResumeDetailInputScreen(
                                             showAddProjectDialog = false
                                             newProjectName = ""
                                             newProjectKeyTasks = ""
-                                        }
-                                    },
-                                    modifier = Modifier.weight(1f),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = PrimaryBlue
-                                    )
-                                ) {
-                                    Text("추가")
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (showAddTechStackDialog) {
-                Dialog(onDismissRequest = { showAddTechStackDialog = false }) {
-                    Surface(
-                        shape = RoundedCornerShape(16.dp),
-                        color = Color.White
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = "기술 스택 추가",
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                modifier = Modifier.padding(bottom = 16.dp)
-                            )
-                            OutlinedTextField(
-                                value = newTechStackName,
-                                onValueChange = { newTechStackName = it },
-                                placeholder = { Text("기술 스택 이름 입력", color = Color.LightGray) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 12.dp),
-                                shape = RoundedCornerShape(12.dp),
-                                singleLine = true,
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor = PrimaryBlue,
-                                    unfocusedBorderColor = Color(0xFFE0E0E0),
-                                    cursorColor = PrimaryBlue
-                                )
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                TextButton(
-                                    onClick = { showAddTechStackDialog = false },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Text("취소", color = Color.Gray)
-                                }
-                                Button(
-                                    onClick = {
-                                        val name = newTechStackName.trim()
-                                        if (name.isNotBlank()) {
-                                            techStacks.add(name)
-                                            showAddTechStackDialog = false
-                                            newTechStackName = ""
                                         }
                                     },
                                     modifier = Modifier.weight(1f),

@@ -105,12 +105,7 @@ fun ResumakerApp(
             val scope = rememberCoroutineScope()
             MyPageScreen(
                 user = sampleUserProfile,
-                educations = sampleEducations,
-                experiences = sampleExperiences,
-                certifications = sampleCertifications,
-                awards = sampleAwards,
                 onBackClick = { navController.popBackStack() },
-                onSaveClick = { },
                 onLogout = {
                     scope.launch {
                         when (val result = authRepository.logout()) {

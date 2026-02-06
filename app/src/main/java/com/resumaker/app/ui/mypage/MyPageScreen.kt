@@ -1,6 +1,7 @@
 package com.resumaker.app.ui.mypage
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,8 +10,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,19 +42,14 @@ import com.resumaker.app.model.Experience
 import com.resumaker.app.model.UserProfile
 import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.theme.ResumakerTheme
+import org.koin.androidx.compose.koinViewModel
 
 private val ScreenBackground = Color(0xFFF8FAFC)
 
 @Composable
 fun MyPageScreen(
     user: UserProfile,
-    educations: List<Education>,
-    experiences: List<Experience>,
-    certifications: List<Certification>,
-    awards: List<Award>,
     onBackClick: () -> Unit,
-    onSaveClick: () -> Unit,
-    hasChanges: Boolean = false,
     onEditBasicInfo: () -> Unit = {},
     onAddEducation: () -> Unit = {},
     onAddExperience: () -> Unit = {},
@@ -52,8 +57,28 @@ fun MyPageScreen(
     onAddAward: () -> Unit = {},
     onLogout: () -> Unit = {},
     onWithdraw: () -> Unit = {},
-    onNavigate: (String) -> Unit = {}
+    onNavigate: (String) -> Unit = {},
+    viewModel: MyPageViewModel = koinViewModel()
 ) {
+    val mypageData by viewModel.mypageData.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val isSaving by viewModel.isSaving.collectAsState()
+    val hasChanges by viewModel.hasChanges.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    val educations = viewModel.educationsForUi(mypageData)
+    val experiences = viewModel.experiencesForUi(mypageData)
+    val certifications = viewModel.certificationsForUi(mypageData)
+    val awards = viewModel.awardsForUi(mypageData)
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { msg ->
+            snackbarHostState.showSnackbar(msg)
+            viewModel.clearErrorMessage()
+        }
+    }
+
     Scaffold(
         topBar = {
             MyPageTopBar(onBackClick = onBackClick)
@@ -66,9 +91,10 @@ fun MyPageScreen(
             ) {
                 if (hasChanges) {
                     PrimaryButton(
-                        text = "저장",
-                        onClick = onSaveClick,
-                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                        text = if (isSaving) "저장 중…" else "저장",
+                        onClick = { viewModel.saveMypage() },
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                        enabled = !isSaving
                     )
                 }
                 ResumakerBottomBar(
@@ -77,81 +103,98 @@ fun MyPageScreen(
                 )
             }
         },
-        containerColor = ScreenBackground
+        containerColor = ScreenBackground,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .background(ScreenBackground)
-                .padding(horizontal = 20.dp)
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                ProfileHeaderSection(name = user.name, job = user.job)
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(20.dp)
+                    )
+                }
+                else -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            ProfileHeaderSection(name = user.name, job = user.job)
 
-                Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                InfoSectionCard(
-                    title = "기본 정보",
-                    onEditClick = onEditBasicInfo,
-                    content = { BasicInfoGrid(user = user) }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                            InfoSectionCard(
+                                title = "기본 정보",
+                                onEditClick = onEditBasicInfo,
+                                content = { BasicInfoGrid(user = user) }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
 
-                InfoSectionCard(
-                    title = "학력 사항",
-                    onAddClick = onAddEducation,
-                    content = {
-                        educations.forEach { edu ->
-                            EducationItem(edu)
+                            InfoSectionCard(
+                                title = "학력 사항",
+                                onAddClick = onAddEducation,
+                                content = {
+                                    educations.forEach { edu ->
+                                        EducationItem(edu)
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            InfoSectionCard(
+                                title = "경력 사항",
+                                onAddClick = onAddExperience,
+                                content = {
+                                    experiences.forEach { exp ->
+                                        ExperienceItem(exp)
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            InfoSectionCard(
+                                title = "자격증",
+                                onAddClick = onAddCertification,
+                                content = {
+                                    certifications.forEach { cert ->
+                                        CertificationItem(cert)
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            InfoSectionCard(
+                                title = "수상 경력",
+                                onAddClick = onAddAward,
+                                content = {
+                                    awards.forEach { award ->
+                                        AwardItem(award)
+                                    }
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            AccountManagementSection(
+                                onLogout = onLogout,
+                                onWithdraw = onWithdraw
+                            )
+
+                            Spacer(modifier = Modifier.height(40.dp))
                         }
                     }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                InfoSectionCard(
-                    title = "경력 사항",
-                    onAddClick = onAddExperience,
-                    content = {
-                        experiences.forEach { exp ->
-                            ExperienceItem(exp)
-                        }
-                    }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                InfoSectionCard(
-                    title = "자격증",
-                    onAddClick = onAddCertification,
-                    content = {
-                        certifications.forEach { cert ->
-                            CertificationItem(cert)
-                        }
-                    }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-
-                InfoSectionCard(
-                    title = "수상 경력",
-                    onAddClick = onAddAward,
-                    content = {
-                        awards.forEach { award ->
-                            AwardItem(award)
-                        }
-                    }
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-
-                AccountManagementSection(
-                    onLogout = onLogout,
-                    onWithdraw = onWithdraw
-                )
-
-                Spacer(modifier = Modifier.height(40.dp))
+                }
             }
         }
     }
@@ -196,18 +239,89 @@ private val sampleAwards = listOf(
     Award("우수 사원상", "연간 성과 평가 우수", "2023", "테크컴퍼니")
 )
 
+/** Preview 전용: ViewModel 없이 샘플 데이터로 화면만 렌더링 */
+@Composable
+private fun MyPageScreenPreviewContent(
+    user: UserProfile,
+    educations: List<Education>,
+    experiences: List<Experience>,
+    certifications: List<Certification>,
+    awards: List<Award>,
+    hasChanges: Boolean = false
+) {
+    Scaffold(
+        topBar = { MyPageTopBar(onBackClick = { }) },
+        bottomBar = {
+            Column(modifier = Modifier.fillMaxWidth().background(ScreenBackground)) {
+                if (hasChanges) {
+                    PrimaryButton(
+                        text = "저장",
+                        onClick = { },
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                    )
+                }
+                ResumakerBottomBar(currentRoute = Routes.MyPage, onNavigate = { })
+            }
+        },
+        containerColor = ScreenBackground
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(ScreenBackground)
+                .padding(horizontal = 20.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                ProfileHeaderSection(name = user.name, job = user.job)
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoSectionCard(title = "기본 정보", onEditClick = { }, content = { BasicInfoGrid(user = user) })
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoSectionCard(
+                    title = "학력 사항",
+                    onAddClick = { },
+                    content = { educations.forEach { EducationItem(it) } }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoSectionCard(
+                    title = "경력 사항",
+                    onAddClick = { },
+                    content = { experiences.forEach { ExperienceItem(it) } }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoSectionCard(
+                    title = "자격증",
+                    onAddClick = { },
+                    content = { certifications.forEach { CertificationItem(it) } }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                InfoSectionCard(
+                    title = "수상 경력",
+                    onAddClick = { },
+                    content = { awards.forEach { AwardItem(it) } }
+                )
+                Spacer(modifier = Modifier.height(24.dp))
+                AccountManagementSection(onLogout = { }, onWithdraw = { })
+                Spacer(modifier = Modifier.height(40.dp))
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun MyPageScreenPreview() {
     ResumakerTheme {
-        MyPageScreen(
+        MyPageScreenPreviewContent(
             user = sampleUser,
             educations = sampleEducations,
             experiences = sampleExperiences,
             certifications = sampleCertifications,
-            awards = sampleAwards,
-            onBackClick = { },
-            onSaveClick = { }
+            awards = sampleAwards
         )
     }
 }
@@ -216,14 +330,12 @@ private fun MyPageScreenPreview() {
 @Composable
 private fun MyPageScreenWithChangesPreview() {
     ResumakerTheme {
-        MyPageScreen(
+        MyPageScreenPreviewContent(
             user = sampleUser,
             educations = sampleEducations,
             experiences = sampleExperiences,
             certifications = sampleCertifications,
             awards = sampleAwards,
-            onBackClick = { },
-            onSaveClick = { },
             hasChanges = true
         )
     }

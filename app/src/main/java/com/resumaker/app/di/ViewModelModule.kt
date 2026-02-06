@@ -2,6 +2,7 @@ package com.resumaker.app.di
 
 import com.resumaker.app.ui.careermanager.CareerManagerViewModel
 import com.resumaker.app.ui.login.LoginViewModel
+import com.resumaker.app.ui.mypage.MyPageViewModel
 import com.resumaker.app.ui.personamanagement.PersonaManagementViewModel
 import com.resumaker.app.ui.resumeedit.ResumeEditViewModel
 import com.resumaker.app.ui.signup.SignUpViewModel
@@ -17,4 +18,5 @@ val viewModelModule = module {
     viewModel { CareerManagerViewModel(get()) }
     viewModel { PersonaManagementViewModel(get()) }
     viewModel { ResumeEditViewModel(get()) }
+    viewModel { MyPageViewModel(get()) }
 }

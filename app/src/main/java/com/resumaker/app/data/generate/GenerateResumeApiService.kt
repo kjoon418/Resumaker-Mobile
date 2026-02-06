@@ -11,6 +11,6 @@ import retrofit2.http.POST
  */
 interface GenerateResumeApiService {
 
-    @POST("generate/")
+    @POST("api/resume/generate/")
     suspend fun generate(@Body body: GenerateResumeRequest): GenerateResumeResponse
 }

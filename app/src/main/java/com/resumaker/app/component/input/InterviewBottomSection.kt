@@ -12,14 +12,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -108,23 +106,8 @@ fun InterviewBottomSection(
                     )
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.End
                     ) {
-                        Row {
-                            Icon(
-                                Icons.Default.Mic,
-                                contentDescription = "음성 입력",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Icon(
-                                Icons.Default.Image,
-                                contentDescription = "이미지 첨부",
-                                tint = Color.Gray,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
                         Text(
                             "${value.length} / 1000",
                             fontSize = 10.sp,
@@ -138,8 +121,14 @@ fun InterviewBottomSection(
                 onClick = onSend,
                 containerColor = PrimaryBlue,
                 contentColor = Color.White,
-                shape = CircleShape,
-                modifier = Modifier.size(48.dp)
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.size(48.dp),
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    pressedElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp
+                )
             ) {
                 Icon(Icons.Default.Send, contentDescription = "전송")
             }

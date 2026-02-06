@@ -2,8 +2,10 @@ package com.resumaker.app.ui.resumeedit
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.resumaker.app.data.generate.GenerateResumeRepository
 import com.resumaker.app.data.persona.PersonaRepository
 import com.resumaker.app.data.remote.ApiResult
+import com.resumaker.app.data.remote.dto.GenerateResumeResponse
 import com.resumaker.app.model.Persona
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +15,17 @@ import kotlinx.coroutines.launch
 
 /**
  * 이력서 편집 화면의 상태 및 로직.
- * 페르소나 피드백 시트에서 면접관 페르소나 목록을 Repository로부터 조회합니다.
+ * - [ResumeCompletionScreen]과 동일한 생성 이력서 목 데이터([GenerateResumeRepository])를 노출.
+ * - 페르소나 피드백 시트에서 면접관 페르소나 목록을 Repository로부터 조회합니다.
  */
 class ResumeEditViewModel(
-    private val personaRepository: PersonaRepository
+    private val personaRepository: PersonaRepository,
+    private val generateResumeRepository: GenerateResumeRepository
 ) : ViewModel() {
+
+    /** [ResumeCompletionScreen]과 동일한 생성 이력서 데이터. 미리보기·편집 폼 초기값에 사용. */
+    private val _generatedResume = MutableStateFlow<GenerateResumeResponse?>(generateResumeRepository.getGeneratedResume())
+    val generatedResume: StateFlow<GenerateResumeResponse?> = _generatedResume.asStateFlow()
 
     private val _personas = MutableStateFlow<List<Persona>>(emptyList())
     val personas: StateFlow<List<Persona>> = _personas.asStateFlow()

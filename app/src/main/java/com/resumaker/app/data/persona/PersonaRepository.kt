@@ -6,8 +6,15 @@ import com.resumaker.app.data.remote.dto.PersonaDto
 import com.resumaker.app.model.Persona
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
+// import retrofit2.HttpException
+// import java.io.IOException
+
+/** [임시 Mock] 메모리 목 데이터. API 복구 시 제거 */
+private val mockPersonas = mutableListOf(
+    Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1", "당신은 친절하고 격려하는 면접관입니다.", "2025.02.05"),
+    Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2", "당신은 기술 깊이를 묻는 면접관입니다.", "2025.02.03"),
+    Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3", "당신은 비즈니스 관점의 면접관입니다.", "2025.02.01")
+)
 
 /**
  * 페르소나 목록 등 페르소나 관련 데이터 소스 진입점.
@@ -18,44 +25,23 @@ class PersonaRepository(
 
     /**
      * 페르소나 목록을 조회합니다.
-     *
-     * @param activeOnly 활성화된 페르소나만 조회 (null이면 미적용)
-     * @param customOnly 커스텀 페르소나만 조회 (null이면 미적용)
-     * @param defaultOnly 기본 페르소나만 조회 (null이면 미적용)
-     * @return [ApiResult.Success] 시 [List]<[Persona]>, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
+     * [임시] API 호출 대신 Mock 목록 반환.
      */
     suspend fun getPersonas(
         activeOnly: Boolean = false,
         customOnly: Boolean = false,
         defaultOnly: Boolean = false
     ): ApiResult<List<Persona>> = withContext(Dispatchers.IO) {
-        try {
-            val list = personaApi.getPersonas(
-                activeOnly = activeOnly,
-                customOnly = customOnly,
-                defaultOnly = defaultOnly
-            )
-            ApiResult.Success(list.map { it.toPersona() })
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "페르소나 목록 조회에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // try {
+        //     val list = personaApi.getPersonas(activeOnly = activeOnly, customOnly = customOnly, defaultOnly = defaultOnly)
+        //     ApiResult.Success(list.map { it.toPersona() })
+        // } catch (e: HttpException) { ... } catch (e: IOException) { ApiResult.NetworkError }
+        ApiResult.Success(mockPersonas.toList())
     }
 
     /**
      * 새 페르소나를 생성합니다.
-     * POST /api/personas/ 호출. 사용자 생성이므로 is_default는 서버에서 false로 설정됩니다.
-     *
-     * @param name 페르소나 이름
-     * @param description 상세 설명
-     * @param prompt AI에게 전달될 지시문
-     * @param isActive 생성 즉시 활성화 여부 (기본 true)
-     * @return [ApiResult.Success] 시 생성된 [Persona], 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
+     * [임시] API 대신 Mock 목록에 추가 후 반환.
      */
     suspend fun createPersona(
         name: String,
@@ -63,36 +49,23 @@ class PersonaRepository(
         prompt: String,
         isActive: Boolean = true
     ): ApiResult<Persona> = withContext(Dispatchers.IO) {
-        try {
-            val request = CreatePersonaRequest(
-                name = name.trim(),
-                description = description.trim(),
-                prompt = prompt.trim(),
-                isActive = isActive
-            )
-            val dto = personaApi.createPersona(request)
-            ApiResult.Success(dto.toPersona())
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "페르소나 생성에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // try { val request = CreatePersonaRequest(...); val dto = personaApi.createPersona(request); ... }
+        val newId = (mockPersonas.maxOfOrNull { it.id.toIntOrNull() ?: 0 } ?: 0) + 1
+        val newPersona = Persona(
+            id = newId.toString(),
+            title = name.trim(),
+            description = description.trim(),
+            iconType = "custom",
+            prompt = prompt.trim(),
+            lastModified = "2025.02.07"
+        )
+        mockPersonas.add(newPersona)
+        ApiResult.Success(newPersona)
     }
 
     /**
      * 페르소나를 수정합니다.
-     * PUT /api/personas/{id}/ 호출. 커스텀 페르소나만 수정 가능합니다.
-     *
-     * @param id 수정할 페르소나의 고유 식별자 (Int)
-     * @param name 이름
-     * @param description 상세 설명
-     * @param prompt AI 지시문
-     * @param isActive 활성화 여부 (기본 true)
-     * @return [ApiResult.Success] 시 수정된 [Persona], 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
+     * [임시] API 대신 Mock 목록 내 항목 갱신 후 반환.
      */
     suspend fun updatePersona(
         id: Int,
@@ -101,49 +74,31 @@ class PersonaRepository(
         prompt: String,
         isActive: Boolean = true
     ): ApiResult<Persona> = withContext(Dispatchers.IO) {
-        try {
-            val request = CreatePersonaRequest(
-                name = name.trim(),
-                description = description.trim(),
-                prompt = prompt.trim(),
-                isActive = isActive
-            )
-            val dto = personaApi.updatePersona(id, request)
-            ApiResult.Success(dto.toPersona())
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "페르소나 수정에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // try { val request = CreatePersonaRequest(...); val dto = personaApi.updatePersona(id, request); ... }
+        val index = mockPersonas.indexOfFirst { it.id == id.toString() }
+        if (index < 0) return@withContext ApiResult.Error(message = "페르소나를 찾을 수 없습니다. (Mock)")
+        val updated = mockPersonas[index].copy(
+            title = name.trim(),
+            description = description.trim(),
+            prompt = prompt.trim(),
+            lastModified = "2025.02.07"
+        )
+        mockPersonas[index] = updated
+        ApiResult.Success(updated)
     }
 
     /**
      * 페르소나를 삭제합니다.
-     * DELETE /api/personas/{id}/ 호출. 커스텀 페르소나만 삭제 가능합니다.
-     *
-     * @param id 삭제할 페르소나의 고유 식별자 (Int)
-     * @return [ApiResult.Success] 시 Unit, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
+     * [임시] API 대신 Mock 목록에서 제거.
      */
     suspend fun deletePersona(id: Int): ApiResult<Unit> = withContext(Dispatchers.IO) {
-        try {
-            personaApi.deletePersona(id)
-            ApiResult.Success(Unit)
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "페르소나 삭제에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // try { personaApi.deletePersona(id); ApiResult.Success(Unit) } catch (e: HttpException) { ... }
+        mockPersonas.removeAll { it.id == id.toString() }
+        ApiResult.Success(Unit)
     }
 }
 
+// [임시 Mock] API 복구 시 사용
 private fun PersonaDto.toPersona(): Persona = Persona(
     id = id.toString(),
     title = name,

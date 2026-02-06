@@ -21,7 +21,7 @@ val viewModelModule = module {
     viewModel { SignUpViewModel(get()) }
     viewModel { CareerManagerViewModel(get()) }
     viewModel { PersonaManagementViewModel(get()) }
-    viewModel { ResumeEditViewModel(get()) }
+    viewModel { ResumeEditViewModel(get(), get()) }
     viewModel { MyPageViewModel(get()) }
     viewModel { ResumeUploadViewModel(get()) }
     viewModel { ResumeDetailInputViewModel(get(), get()) }

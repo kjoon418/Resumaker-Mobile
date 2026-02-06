@@ -1,14 +1,14 @@
 package com.resumaker.app.data.auth
 
 import com.resumaker.app.data.remote.ApiResult
-import com.resumaker.app.data.remote.dto.LoginRequest
-import com.resumaker.app.data.remote.dto.RegisterRequest
-import com.resumaker.app.data.remote.dto.UserDto
 import com.resumaker.app.model.UserProfile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
-import java.io.IOException
+// [임시 Mock] import com.resumaker.app.data.remote.dto.LoginRequest
+// import com.resumaker.app.data.remote.dto.RegisterRequest
+// import com.resumaker.app.data.remote.dto.UserDto
+// import retrofit2.HttpException
+// import java.io.IOException
 
 /**
  * 인증 관련 데이터 소스 진입점.
@@ -30,20 +30,30 @@ class AuthRepository(
      * @return [ApiResult.Success] 시 [LoginResult] 반환, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
      */
     suspend fun login(email: String, password: String): ApiResult<LoginResult> = withContext(Dispatchers.IO) {
-        try {
-            val request = LoginRequest(email = email.trim(), password = password)
-            val response = authApi.login(request)
-            val userProfile = response.user.toUserProfile()
-            ApiResult.Success(LoginResult(message = response.message, user = userProfile))
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "로그인에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // [임시] API 호출 주석 처리, Mock 데이터로 로그인 성공 처리
+        // try {
+        //     val request = LoginRequest(email = email.trim(), password = password)
+        //     val response = authApi.login(request)
+        //     val userProfile = response.user.toUserProfile()
+        //     ApiResult.Success(LoginResult(message = response.message, user = userProfile))
+        // } catch (e: HttpException) {
+        //     val errorBody = e.response()?.errorBody()?.string()
+        //     val message = errorBody?.takeIf { it.isNotBlank() } ?: "로그인에 실패했습니다. (${e.code()})"
+        //     ApiResult.Error(message = message, code = e.code())
+        // } catch (e: IOException) {
+        //     ApiResult.NetworkError
+        // } catch (e: Exception) {
+        //     ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
+        // }
+        val mockUser = UserProfile(
+            name = "홍길동",
+            email = email.ifBlank { "hong@example.com" },
+            age = 28,
+            gender = "MALE",
+            job = "프론트엔드 개발자",
+            phoneNumber = "010-1234-5678"
+        )
+        ApiResult.Success(LoginResult(message = "로그인 성공 (Mock)", user = mockUser))
     }
 
     /**
@@ -53,18 +63,12 @@ class AuthRepository(
      * @return [ApiResult.Success] 시 [LogoutResult] 반환, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
      */
     suspend fun logout(): ApiResult<LogoutResult> = withContext(Dispatchers.IO) {
-        try {
-            val response = authApi.logout()
-            ApiResult.Success(LogoutResult(message = response.message))
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "로그아웃에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // [임시] API 호출 주석 처리, Mock 성공 반환
+        // try {
+        //     val response = authApi.logout()
+        //     ApiResult.Success(LogoutResult(message = response.message))
+        // } catch (e: HttpException) { ... } catch (e: IOException) { ... }
+        ApiResult.Success(LogoutResult(message = "로그아웃되었습니다. (Mock)"))
     }
 
     /**
@@ -75,29 +79,21 @@ class AuthRepository(
      * @return [ApiResult.Success] 시 [RegisterResult] 반환, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
      */
     suspend fun register(params: RegisterParams): ApiResult<RegisterResult> = withContext(Dispatchers.IO) {
-        try {
-            val request = RegisterRequest(
-                username = params.username.trim(),
-                email = params.email.trim(),
-                password = params.password,
-                name = params.name.trim(),
-                age = params.age,
-                gender = params.gender,
-                job = params.job.trim(),
-                phoneNumber = params.phoneNumber.trim()
-            )
-            val response = authApi.register(request)
-            val userProfile = response.user.toUserProfile()
-            ApiResult.Success(RegisterResult(message = response.message, user = userProfile))
-        } catch (e: HttpException) {
-            val errorBody = e.response()?.errorBody()?.string()
-            val message = errorBody?.takeIf { it.isNotBlank() } ?: "회원가입에 실패했습니다. (${e.code()})"
-            ApiResult.Error(message = message, code = e.code())
-        } catch (e: IOException) {
-            ApiResult.NetworkError
-        } catch (e: Exception) {
-            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
-        }
+        // [임시] API 호출 주석 처리, Mock 성공 반환
+        // try {
+        //     val request = RegisterRequest(...)
+        //     val response = authApi.register(request)
+        //     ...
+        // } catch (e: HttpException) { ... } catch (e: IOException) { ... }
+        val mockUser = UserProfile(
+            name = params.name,
+            email = params.email,
+            age = params.age,
+            gender = params.gender,
+            job = params.job,
+            phoneNumber = params.phoneNumber
+        )
+        ApiResult.Success(RegisterResult(message = "회원가입 완료 (Mock)", user = mockUser))
     }
 }
 
@@ -139,11 +135,7 @@ data class RegisterResult(
     val user: UserProfile
 )
 
-private fun UserDto.toUserProfile(): UserProfile = UserProfile(
-    name = name,
-    email = email,
-    age = age,
-    gender = gender,
-    job = job,
-    phoneNumber = phoneNumber
-)
+// [임시 Mock] API 복구 시 사용
+// private fun UserDto.toUserProfile(): UserProfile = UserProfile(
+//     name = name, email = email, age = age, gender = gender, job = job, phoneNumber = phoneNumber
+// )

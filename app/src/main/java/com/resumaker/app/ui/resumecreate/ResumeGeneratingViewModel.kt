@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.resumaker.app.data.generate.GenerateResumeRepository
 import com.resumaker.app.data.remote.ApiResult
 import com.resumaker.app.data.remote.dto.GenerateResumeResponse
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,6 +45,7 @@ class ResumeGeneratingViewModel(
                 is ApiResult.Success -> {
                     generateResumeRepository.setGeneratedResume(result.data)
                     _isGenerating.update { false }
+                    delay(3000L) // 생성 완료 후 3초 지연 후 다음 페이지로 이동
                     onNavigateToCompletion()
                 }
                 is ApiResult.Error -> {

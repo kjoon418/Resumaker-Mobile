@@ -164,7 +164,11 @@ fun ResumakerApp(
 
         composable(Routes.NewResumeStep3) {
             ResumeGeneratingScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    navController.navigate(Routes.Home) {
+                        popUpTo(Routes.Home) { inclusive = true }
+                    }
+                },
                 onCompleteClick = { navController.navigate(Routes.NewResumeStep4) }
             )
         }
@@ -187,7 +191,11 @@ fun ResumakerApp(
 
         composable(Routes.NewResumeStep4) {
             ResumeCompletionScreen(
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    navController.navigate(Routes.Home) {
+                        popUpTo(Routes.Home) { inclusive = true }
+                    }
+                },
                 onEditClick = { navController.navigate(Routes.ResumeEdit) },
                 onSaveClick = { },
                 onCloseClick = { navController.navigate(Routes.Home) { popUpTo(Routes.Home) { inclusive = true } } }

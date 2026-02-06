@@ -1,5 +1,6 @@
 package com.resumaker.app.ui.resumecreate
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +19,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.SaveAlt
@@ -51,6 +51,7 @@ fun ResumeCompletionScreen(
     onSaveClick: () -> Unit,
     onCloseClick: () -> Unit = {}
 ) {
+    BackHandler(onBack = onBackClick)
     Scaffold(
         topBar = {
             Row(
@@ -59,13 +60,7 @@ fun ResumeCompletionScreen(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        Icons.Default.ArrowBackIosNew,
-                        contentDescription = "뒤로가기",
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.size(48.dp))
                 Text(
                     text = "이력서 완성",
                     modifier = Modifier.weight(1f),

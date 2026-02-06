@@ -1,5 +1,6 @@
 package com.resumaker.app.ui.resumecreate
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -18,11 +19,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -48,6 +47,7 @@ fun ResumeGeneratingScreen(
     onBackClick: () -> Unit,
     onCompleteClick: () -> Unit = {}
 ) {
+    BackHandler(onBack = onBackClick)
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -67,13 +67,7 @@ fun ResumeGeneratingScreen(
                     .padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        Icons.Default.ArrowBackIosNew,
-                        contentDescription = "뒤로가기",
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                Spacer(modifier = Modifier.size(48.dp))
                 Text(
                     text = "새 이력서 생성",
                     modifier = Modifier.weight(1f),

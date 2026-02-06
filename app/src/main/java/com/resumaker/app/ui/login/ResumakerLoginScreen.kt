@@ -1,7 +1,9 @@
 package com.resumaker.app.ui.login
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -38,9 +40,10 @@ fun ResumakerLoginScreen(
 
     Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(horizontal = 24.dp)
             .padding(top = 60.dp, bottom = 24.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         // --- 1. 헤더 섹션 ---
         LoginHeader()
@@ -96,8 +99,8 @@ fun ResumakerLoginScreen(
             onClick = { onLoginSuccess() }
         )
 
-        // 하단 여백을 채워주어 회원가입 문구를 맨 아래로 밀어냅니다.
-        Spacer(modifier = Modifier.weight(1f))
+        // 키보드 올라왔을 때도 레이아웃이 찌그러지지 않도록 스크롤 사용. weight 대신 고정 여백.
+        Spacer(modifier = Modifier.height(40.dp))
 
         // --- 4. 하단 회원가입 안내 ---
         Row(

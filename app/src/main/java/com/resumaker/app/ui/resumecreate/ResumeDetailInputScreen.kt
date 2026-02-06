@@ -98,6 +98,9 @@ fun ResumeDetailInputScreen(
     var newProjectName by remember { mutableStateOf("") }
     var newProjectKeyTasks by remember { mutableStateOf("") }
 
+    var showAddTechStackDialog by remember { mutableStateOf(false) }
+    var newTechStackName by remember { mutableStateOf("") }
+
     var newKeyword by remember { mutableStateOf("") }
     var showAddKeyword by remember { mutableStateOf(false) }
 
@@ -414,7 +417,7 @@ fun ResumeDetailInputScreen(
                 }
                 InputChip(
                     selected = false,
-                    onClick = { techStacks.add("새 기술") },
+                    onClick = { showAddTechStackDialog = true },
                     label = { Text("+ 추가") }
                 )
             }
@@ -711,6 +714,70 @@ fun ResumeDetailInputScreen(
                                             showAddProjectDialog = false
                                             newProjectName = ""
                                             newProjectKeyTasks = ""
+                                        }
+                                    },
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = PrimaryBlue
+                                    )
+                                ) {
+                                    Text("추가")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (showAddTechStackDialog) {
+                Dialog(onDismissRequest = { showAddTechStackDialog = false }) {
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color.White
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "기술 스택 추가",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+                            OutlinedTextField(
+                                value = newTechStackName,
+                                onValueChange = { newTechStackName = it },
+                                placeholder = { Text("기술 스택 이름 입력", color = Color.LightGray) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 12.dp),
+                                shape = RoundedCornerShape(12.dp),
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryBlue,
+                                    unfocusedBorderColor = Color(0xFFE0E0E0),
+                                    cursorColor = PrimaryBlue
+                                )
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                TextButton(
+                                    onClick = { showAddTechStackDialog = false },
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text("취소", color = Color.Gray)
+                                }
+                                Button(
+                                    onClick = {
+                                        val name = newTechStackName.trim()
+                                        if (name.isNotBlank()) {
+                                            techStacks.add(name)
+                                            showAddTechStackDialog = false
+                                            newTechStackName = ""
                                         }
                                     },
                                     modifier = Modifier.weight(1f),

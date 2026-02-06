@@ -1,5 +1,6 @@
 package com.resumaker.app.ui.resumecreate
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -15,30 +16,27 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SuggestionChip
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.ui.window.Dialog
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -53,13 +51,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
 import com.resumaker.app.component.progress.StepProgressBar
-import com.resumaker.app.component.button.PrimaryButton
+import com.resumaker.app.component.section.InfoBanner
 import com.resumaker.app.ui.theme.ResumakerTheme
 
-private val InfoBannerBackground = Color(0xFFEFF6FF)
-private val InfoBannerTextColor = Color(0xFF1E40AF)
 private val PrimaryBlue = Color(0xFF2161EE)
 
 private data class ExtraInfoItem(
@@ -67,34 +65,6 @@ private data class ExtraInfoItem(
     val title: String,
     val content: String
 )
-
-@Composable
-fun InfoBanner(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        color = InfoBannerBackground,
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-            Icon(
-                Icons.Default.AutoAwesome,
-                contentDescription = null,
-                tint = PrimaryBlue,
-                modifier = Modifier.size(20.dp)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = text,
-                fontSize = 13.sp,
-                color = InfoBannerTextColor,
-                lineHeight = 18.sp
-            )
-        }
-    }
-}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

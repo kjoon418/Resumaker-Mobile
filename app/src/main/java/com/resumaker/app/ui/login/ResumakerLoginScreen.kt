@@ -1,8 +1,6 @@
 package com.resumaker.app.ui.login
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -19,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
+import com.resumaker.app.component.section.LoginHeader
 
 @Composable
 fun ResumakerLoginScreen(
@@ -102,45 +101,6 @@ fun ResumakerLoginScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun LoginHeader() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .background(Color(0xFF2161EE), RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("R", color = Color.White, fontWeight = FontWeight.Black, fontSize = 20.sp)
-            }
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(
-                text = "Resumaker",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
-        }
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            text = "반가워요!\n다시 시작해볼까요?",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 38.sp,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = "AI와 함께 당신의 커리어를 완성하세요.",
-            fontSize = 15.sp,
-            color = Color.Gray
-        )
     }
 }
 

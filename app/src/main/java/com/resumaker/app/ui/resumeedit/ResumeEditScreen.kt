@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.BugReport
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.PictureAsPdf
@@ -61,7 +60,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,8 +67,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.button.PrimaryButton
+import com.resumaker.app.component.card.FeedbackOptionCard
+import com.resumaker.app.component.card.ResumePreviewCard
+import com.resumaker.app.component.card.SelectionItemCard
 import com.resumaker.app.component.input.PrimaryTextField
-import com.resumaker.app.ui.resumecreate.ResumePreviewCard
 import com.resumaker.app.ui.theme.ResumakerTheme
 
 private val PrimaryBlue = Color(0xFF2161EE)
@@ -445,96 +445,6 @@ fun ResumeEditScreen(
                 }
                 Spacer(modifier = Modifier.height(40.dp))
             }
-        }
-    }
-}
-
-@Composable
-fun FeedbackOptionCard(
-    title: String,
-    description: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF8FAFC)),
-        border = BorderStroke(1.dp, Color(0xFFE2E8F0))
-    ) {
-        Row(
-            modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                icon,
-                contentDescription = null,
-                tint = PrimaryBlue,
-                modifier = Modifier.size(32.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-                Text(
-                    description,
-                    color = Color.Gray,
-                    fontSize = 12.sp
-                )
-            }
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = Color.LightGray,
-                modifier = Modifier.size(24.dp)
-            )
-        }
-    }
-}
-
-@Composable
-fun SelectionItemCard(
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(1.dp, Color(0xFFF1F5F9))
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
-                )
-                if (subtitle.isNotEmpty()) {
-                    Text(
-                        subtitle,
-                        color = Color.Gray,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-            Icon(
-                Icons.Default.ChevronRight,
-                contentDescription = null,
-                tint = Color.LightGray,
-                modifier = Modifier.size(24.dp)
-            )
         }
     }
 }

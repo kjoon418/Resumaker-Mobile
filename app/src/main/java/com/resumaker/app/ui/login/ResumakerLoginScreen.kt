@@ -21,7 +21,10 @@ import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
 
 @Composable
-fun ResumakerLoginScreen() {
+fun ResumakerLoginScreen(
+    onLoginSuccess: () -> Unit = {},
+    onNavigateToSignUp: () -> Unit = {}
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -74,7 +77,7 @@ fun ResumakerLoginScreen() {
         // --- 3. 로그인 버튼 ---
         PrimaryButton(
             text = "로그인",
-            onClick = { /* 로그인 로직 수행 */ }
+            onClick = { onLoginSuccess() }
         )
 
         // 하단 여백을 채워주어 회원가입 문구를 맨 아래로 밀어냅니다.
@@ -88,7 +91,7 @@ fun ResumakerLoginScreen() {
         ) {
             Text("계정이 없으신가요?", color = Color.Gray, fontSize = 14.sp)
             TextButton(
-                onClick = { /* 회원가입 페이지 이동 */ },
+                onClick = onNavigateToSignUp,
                 contentPadding = PaddingValues(start = 4.dp)
             ) {
                 Text(

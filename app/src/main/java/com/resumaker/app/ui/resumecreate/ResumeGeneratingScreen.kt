@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,7 +45,8 @@ private val PrimaryBlue = Color(0xFF2161EE)
 
 @Composable
 fun ResumeGeneratingScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onCompleteClick: () -> Unit = {}
 ) {
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
     val rotation by infiniteTransition.animateFloat(
@@ -151,6 +153,11 @@ fun ResumeGeneratingScreen(
                     textAlign = TextAlign.Center,
                     lineHeight = 20.sp
                 )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+            TextButton(onClick = onCompleteClick) {
+                Text("완성 화면 보기", color = PrimaryBlue, fontSize = 14.sp)
             }
 
             Spacer(modifier = Modifier.weight(1f))

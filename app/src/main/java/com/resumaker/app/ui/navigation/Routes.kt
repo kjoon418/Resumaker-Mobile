@@ -28,4 +28,7 @@ object Routes {
 
     /** 새 이력서 작성 3단계: 이력서 생성 중 */
     const val NewResumeStep3 = "resumes/new/step3"
+
+    /** 새 이력서 작성 4단계: 완성된 이력서 조회 */
+    const val NewResumeStep4 = "resumes/new/step4"
 }

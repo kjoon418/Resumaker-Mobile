@@ -82,6 +82,66 @@ class PersonaRepository(
             ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
         }
     }
+
+    /**
+     * 페르소나를 수정합니다.
+     * PUT /api/personas/{id}/ 호출. 커스텀 페르소나만 수정 가능합니다.
+     *
+     * @param id 수정할 페르소나의 고유 식별자 (Int)
+     * @param name 이름
+     * @param description 상세 설명
+     * @param prompt AI 지시문
+     * @param isActive 활성화 여부 (기본 true)
+     * @return [ApiResult.Success] 시 수정된 [Persona], 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
+     */
+    suspend fun updatePersona(
+        id: Int,
+        name: String,
+        description: String,
+        prompt: String,
+        isActive: Boolean = true
+    ): ApiResult<Persona> = withContext(Dispatchers.IO) {
+        try {
+            val request = CreatePersonaRequest(
+                name = name.trim(),
+                description = description.trim(),
+                prompt = prompt.trim(),
+                isActive = isActive
+            )
+            val dto = personaApi.updatePersona(id, request)
+            ApiResult.Success(dto.toPersona())
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val message = errorBody?.takeIf { it.isNotBlank() } ?: "페르소나 수정에 실패했습니다. (${e.code()})"
+            ApiResult.Error(message = message, code = e.code())
+        } catch (e: IOException) {
+            ApiResult.NetworkError
+        } catch (e: Exception) {
+            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
+        }
+    }
+
+    /**
+     * 페르소나를 삭제합니다.
+     * DELETE /api/personas/{id}/ 호출. 커스텀 페르소나만 삭제 가능합니다.
+     *
+     * @param id 삭제할 페르소나의 고유 식별자 (Int)
+     * @return [ApiResult.Success] 시 Unit, 실패 시 [ApiResult.Error] 또는 [ApiResult.NetworkError]
+     */
+    suspend fun deletePersona(id: Int): ApiResult<Unit> = withContext(Dispatchers.IO) {
+        try {
+            personaApi.deletePersona(id)
+            ApiResult.Success(Unit)
+        } catch (e: HttpException) {
+            val errorBody = e.response()?.errorBody()?.string()
+            val message = errorBody?.takeIf { it.isNotBlank() } ?: "페르소나 삭제에 실패했습니다. (${e.code()})"
+            ApiResult.Error(message = message, code = e.code())
+        } catch (e: IOException) {
+            ApiResult.NetworkError
+        } catch (e: Exception) {
+            ApiResult.Error(message = e.message ?: "알 수 없는 오류가 발생했습니다.")
+        }
+    }
 }
 
 private fun PersonaDto.toPersona(): Persona = Persona(
@@ -89,5 +149,6 @@ private fun PersonaDto.toPersona(): Persona = Persona(
     title = name,
     description = description,
     iconType = if (isDefault) "default" else "custom",
+    prompt = prompt,
     lastModified = updatedAt ?: createdAt ?: ""
 )

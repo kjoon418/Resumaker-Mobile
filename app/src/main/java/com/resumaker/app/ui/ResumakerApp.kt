@@ -9,11 +9,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import com.resumaker.app.data.remote.ApiResult
 import com.resumaker.app.data.auth.AuthRepository
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -26,9 +29,11 @@ import androidx.navigation.compose.rememberNavController
 import com.resumaker.app.model.Persona
 import com.resumaker.app.model.Resume
 import com.resumaker.app.ui.careermanager.CareerManagerScreen
+import com.resumaker.app.ui.careermanager.CareerManagerViewModel
 import com.resumaker.app.ui.login.ResumakerLoginScreen
 import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.personamanagement.PersonaManagementScreen
+import com.resumaker.app.ui.personamanagement.PersonaManagementViewModel
 import com.resumaker.app.ui.resumelist.ResumeListScreen
 import com.resumaker.app.ui.resumecreate.ResumeCompletionScreen
 import com.resumaker.app.ui.resumecreate.ResumeDetailInputScreen
@@ -73,9 +78,11 @@ fun ResumakerApp(
         }
 
         composable(Routes.Home) {
+            val careerManagerViewModel: CareerManagerViewModel = koinViewModel()
+            val personas by careerManagerViewModel.personas.collectAsState()
             CareerManagerScreen(
                 resumes = sampleResumes,
-                personas = samplePersonas,
+                personas = personas,
                 onViewAllResumes = { navController.navigate(Routes.AllResumes) },
                 onViewAllPersonas = { navController.navigate(Routes.AllPersonas) },
                 onCreateNewResume = { navController.navigate(Routes.NewResume) },
@@ -146,12 +153,9 @@ fun ResumakerApp(
 
         composable(Routes.AllPersonas) {
             PersonaManagementScreen(
-                personaList = samplePersonas,
                 onBackClick = { navController.popBackStack() },
                 onSearchClick = { },
                 onAddClick = { },
-                onEditClick = { },
-                onDeleteClick = { },
                 onNavigate = { route ->
                     navController.navigate(route) {
                         popUpTo(Routes.Home) { inclusive = false }
@@ -229,9 +233,9 @@ private val sampleResumes = listOf(
 )
 
 private val samplePersonas = listOf(
-    Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1", "2025.02.05"),
-    Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2", "2025.02.03"),
-    Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3", "2025.02.01")
+    Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1", "", "2025.02.05"),
+    Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2", "", "2025.02.03"),
+    Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3", "", "2025.02.01")
 )
 
 private val sampleUserProfile = UserProfile(

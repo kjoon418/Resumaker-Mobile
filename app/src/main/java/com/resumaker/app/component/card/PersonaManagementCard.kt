@@ -36,10 +36,8 @@ import androidx.compose.ui.unit.sp
 import com.resumaker.app.R
 import com.resumaker.app.model.Persona
 
-private val PersonaIconBackground = Color(0xFFEEF2FF)
-private val PersonaIconTint = Color(0xFF2161EE)
-private val DescriptionBoxBackground = Color(0xFFF1F5F9)
 private val ActionIconTint = Color.Gray
+private val PromptBoxBackground = Color(0xFFF1F5F9)
 
 @Composable
 fun PersonaManagementCard(
@@ -69,14 +67,26 @@ fun PersonaManagementCard(
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(
-                    text = persona.title,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = persona.title,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    if (persona.description.isNotBlank()) {
+                        Text(
+                            text = persona.description,
+                            fontSize = 13.sp,
+                            color = Color.DarkGray,
+                            lineHeight = 20.sp,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                }
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(0.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -101,25 +111,26 @@ fun PersonaManagementCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = DescriptionBoxBackground,
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = persona.description,
-                    modifier = Modifier.padding(16.dp),
-                    fontSize = 14.sp,
-                    color = Color.DarkGray,
-                    lineHeight = 22.sp,
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
+            if (persona.prompt.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = PromptBoxBackground,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = persona.prompt,
+                        modifier = Modifier.padding(16.dp),
+                        fontSize = 14.sp,
+                        color = Color.DarkGray,
+                        lineHeight = 22.sp,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Box(
                 modifier = Modifier.fillMaxWidth(),

@@ -266,7 +266,8 @@ private val previewPersona = Persona(
     id = "1",
     title = "친절한 면접관",
     description = "많은 피드백을 주며 대화를 이끌어 줍니다.",
-    iconType = "persona1"
+    iconType = "persona1",
+    prompt = ""
 )
 
 @Preview(showBackground = true)

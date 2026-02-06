@@ -10,5 +10,6 @@ data class Persona(
     val title: String,
     val description: String,
     val iconType: String,
+    val prompt: String,
     val lastModified: String = ""
 )

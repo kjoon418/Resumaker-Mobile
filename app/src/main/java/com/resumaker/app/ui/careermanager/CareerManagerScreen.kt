@@ -134,9 +134,9 @@ private fun CareerManagerScreenPreview() {
                 Resume("3", "풀스택 포트폴리오", "2025.01.28", "doc")
             ),
             personas = listOf(
-                Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1"),
-                Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2"),
-                Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3")
+                Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1", ""),
+                Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2", ""),
+                Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3", "")
             ),
             onViewAllResumes = { },
             onViewAllPersonas = { },

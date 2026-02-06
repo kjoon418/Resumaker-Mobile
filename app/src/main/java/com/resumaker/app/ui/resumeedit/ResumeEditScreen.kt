@@ -45,6 +45,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,6 +73,7 @@ import com.resumaker.app.component.card.ResumePreviewCard
 import com.resumaker.app.component.card.SelectionItemCard
 import com.resumaker.app.component.input.PrimaryTextField
 import com.resumaker.app.ui.theme.ResumakerTheme
+import org.koin.androidx.compose.koinViewModel
 
 private val PrimaryBlue = Color(0xFF2161EE)
 private val FabColor = Color(0xFF6366F1)
@@ -112,7 +114,6 @@ private class SpeechBubbleTailRightShape(
 
 // TODO: 서버 API 연결 시 ViewModel에서 관리
 private data class AntiPatternItem(val title: String, val description: String)
-private data class PersonaItem(val title: String, val description: String)
 
 private val antiPatterns = listOf(
     AntiPatternItem("단순 나열형 이력서", "경험과 기술을 단순 나열만 하고 있는지 확인합니다."),
@@ -121,22 +122,18 @@ private val antiPatterns = listOf(
     AntiPatternItem("가독성 박살", "구조와 가독성에 문제가 있는지 확인합니다.")
 )
 
-// TODO: 서버에서 페르소나 목록 조회
-private val personaItems = listOf(
-    PersonaItem("데이터 분석가", "근거를 중시하는 성격"),
-    PersonaItem("정통 대기업 임원", "태도, 말투, 기술 스택 등 기본 중시"),
-    PersonaItem("스타트업 CEO", "혁신을 선호"),
-    PersonaItem("효율 중시형", "핵심만 담은 짧은 답변 선호")
-)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ResumeEditScreen(
     onBackClick: () -> Unit,
     onSaveClick: () -> Unit = {},
     onPdfExportClick: () -> Unit = {},
-    onInterviewClick: () -> Unit = {}
+    onInterviewClick: () -> Unit = {},
+    viewModel: ResumeEditViewModel = koinViewModel()
 ) {
+    val personas by viewModel.personas.collectAsState()
+    val isLoadingPersonas by viewModel.isLoadingPersonas.collectAsState()
+    val personasError by viewModel.personasError.collectAsState()
     var isPreviewMode by remember { mutableStateOf(false) }
     var showAiSheet by remember { mutableStateOf(false) }
     var showAntiPatternSheet by remember { mutableStateOf(false) }
@@ -369,6 +366,7 @@ fun ResumeEditScreen(
                     onClick = {
                         showAiSheet = false
                         showPersonaSheet = true
+                        viewModel.loadPersonas()
                     }
                 )
                 Spacer(modifier = Modifier.height(40.dp))
@@ -430,18 +428,43 @@ fun ResumeEditScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "페르소나를 선택하세요. (서버 데이터 연동 예정)",
+                    "페르소나를 선택하세요.",
                     color = Color.Gray,
                     fontSize = 14.sp
                 )
                 Spacer(modifier = Modifier.height(20.dp))
-                personaItems.forEach { item ->
-                    SelectionItemCard(
-                        title = item.title,
-                        subtitle = item.description,
-                        onClick = { /* TODO: API 요청 후 피드백 화면으로 */ showPersonaSheet = false }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+                when {
+                    isLoadingPersonas -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("페르소나 목록을 불러오는 중...", color = Color.Gray, fontSize = 14.sp)
+                        }
+                    }
+                    personasError != null -> {
+                        Text(
+                            text = personasError!!,
+                            color = Color(0xFFDC2626),
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
+                        TextButton(onClick = { viewModel.loadPersonas() }) {
+                            Text("다시 시도", color = PrimaryBlue)
+                        }
+                    }
+                    else -> {
+                        personas.forEach { persona ->
+                            SelectionItemCard(
+                                title = persona.title,
+                                subtitle = persona.description,
+                                onClick = { /* TODO: API 요청 후 피드백 화면으로 */ showPersonaSheet = false }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
                 }
                 Spacer(modifier = Modifier.height(40.dp))
             }

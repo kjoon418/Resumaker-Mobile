@@ -1,5 +1,6 @@
 package com.resumaker.app.component.button
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,10 +27,12 @@ fun PrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    filled: Boolean = true,
     backgroundColor: Color = Color(0xFF2161EE),
     contentColor: Color = Color.White,
     showShadow: Boolean = false
 ) {
+    val primaryBlue = Color(0xFF2161EE)
     Button(
         onClick = onClick,
         enabled = enabled,
@@ -38,9 +41,10 @@ fun PrimaryButton(
             .height(56.dp),
         shape = RoundedCornerShape(12.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor
+            containerColor = if (filled) backgroundColor else Color.Transparent,
+            contentColor = if (filled) contentColor else primaryBlue
         ),
+        border = if (filled) null else BorderStroke(1.dp, primaryBlue),
         elevation = if (showShadow) {
             ButtonDefaults.buttonElevation(
                 defaultElevation = 6.dp,

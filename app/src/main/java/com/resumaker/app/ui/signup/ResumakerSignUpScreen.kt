@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -14,10 +15,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.appbar.ResumakerTopBar
@@ -138,11 +142,15 @@ private fun Step1Content(
 
     Spacer(modifier = Modifier.height(40.dp))
 
+    val focusManager = LocalFocusManager.current
+
     PrimaryTextField(
         value = name,
         onValueChange = onNameChange,
         label = "이름",
-        placeholder = "홍길동"
+        placeholder = "홍길동",
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Next) })
     )
 
     Spacer(modifier = Modifier.height(20.dp))
@@ -152,7 +160,8 @@ private fun Step1Content(
         onValueChange = onEmailChange,
         label = "이메일",
         placeholder = "example@resumaker.com",
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Next) })
     )
 
     Spacer(modifier = Modifier.height(20.dp))
@@ -170,7 +179,8 @@ private fun Step1Content(
                 tint = Color.Gray
             )
         },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { if (canProceed) onNextClick() })
     )
 
     Spacer(modifier = Modifier.height(24.dp))
@@ -237,12 +247,18 @@ private fun Step2Content(
 
     Spacer(modifier = Modifier.height(40.dp))
 
+    val focusManager = LocalFocusManager.current
+
     PrimaryTextField(
         value = age,
         onValueChange = { if (it.isEmpty() || it.all { c -> c.isDigit() }) onAgeChange(it) },
         label = "나이",
         placeholder = "만 나이를 입력해주세요",
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = {
+            focusManager.clearFocus()
+            onGenderExpandedChange(true)
+        })
     )
 
     Spacer(modifier = Modifier.height(20.dp))
@@ -268,9 +284,7 @@ private fun Step2Content(
                         tint = Color.Gray
                     )
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onGenderExpandedChange(!genderExpanded) },
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color(0xFF2161EE),
@@ -278,6 +292,12 @@ private fun Step2Content(
                     focusedLabelColor = Color(0xFF2161EE),
                     cursorColor = Color(0xFF2161EE)
                 )
+            )
+            // 클릭을 받아 드롭다운을 열기 위한 투명 레이어 (TextField가 포커스만 가져가 클릭이 전달되지 않는 문제 방지)
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .clickable { onGenderExpandedChange(!genderExpanded) }
             )
 
             DropdownMenu(
@@ -303,7 +323,9 @@ private fun Step2Content(
         value = occupation,
         onValueChange = onOccupationChange,
         label = "직업",
-        placeholder = "예: 개발자, 디자이너"
+        placeholder = "예: 개발자, 디자이너",
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Next) })
     )
 
     Spacer(modifier = Modifier.height(20.dp))
@@ -313,7 +335,8 @@ private fun Step2Content(
         onValueChange = onContactChange,
         label = "연락처",
         placeholder = "010-0000-0000",
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone, imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { if (canSubmit) onSubmitClick() })
     )
 
     Spacer(modifier = Modifier.height(24.dp))
@@ -322,13 +345,12 @@ private fun Step2Content(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        OutlinedButton(
+        PrimaryButton(
+            text = "이전",
             onClick = onBackClick,
             modifier = Modifier.weight(1f),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text("이전")
-        }
+            filled = false
+        )
         PrimaryButton(
             text = "회원가입 완료",
             onClick = onSubmitClick,

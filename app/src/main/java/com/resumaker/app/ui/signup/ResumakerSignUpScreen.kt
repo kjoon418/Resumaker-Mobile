@@ -28,6 +28,11 @@ import com.resumaker.app.component.appbar.ResumakerTopBar
 import com.resumaker.app.component.button.PrimaryButton
 import com.resumaker.app.component.input.PrimaryTextField
 import com.resumaker.app.component.input.TermCheckbox
+import com.resumaker.app.data.auth.AuthRepository
+import com.resumaker.app.data.auth.RegisterParams
+import com.resumaker.app.data.remote.ApiResult
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 
 private const val STEP_1 = 1
 private const val STEP_2 = 2
@@ -39,12 +44,22 @@ private val GENDER_OPTIONS = listOf(
     "기타"
 )
 
+/** UI 성별 표시 → API 값 (M/F/O) */
+private fun genderToApi(genderDisplay: String): String = when (genderDisplay) {
+    "남성" -> "M"
+    "여성" -> "F"
+    "기타" -> "O"
+    else -> "O"
+}
+
 @Composable
 fun ResumakerSignUpScreen(
     onBackClick: () -> Unit,
-    onLoginClick: () -> Unit
+    onLoginClick: () -> Unit,
+    authRepository: AuthRepository = koinInject()
 ) {
     var currentStep by remember { mutableIntStateOf(STEP_1) }
+    val scope = rememberCoroutineScope()
 
     // 1단계: 이름, 이메일, 비밀번호
     var name by remember { mutableStateOf("") }
@@ -58,6 +73,9 @@ fun ResumakerSignUpScreen(
     var genderExpanded by remember { mutableStateOf(false) }
     var occupation by remember { mutableStateOf("") }
     var contact by remember { mutableStateOf("") }
+
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isRegistering by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -105,9 +123,32 @@ fun ResumakerSignUpScreen(
                 contact = contact,
                 onContactChange = { contact = it },
                 onBackClick = { currentStep = STEP_1 },
-                onSubmitClick = { /* 회원가입 로직 */ },
+                onSubmitClick = {
+                    errorMessage = null
+                    scope.launch {
+                        isRegistering = true
+                        val params = RegisterParams(
+                            username = email.trim(),
+                            email = email.trim(),
+                            password = password,
+                            name = name.trim(),
+                            age = age.toIntOrNull() ?: 0,
+                            gender = genderToApi(gender),
+                            job = occupation.trim(),
+                            phoneNumber = contact.trim()
+                        )
+                        when (val result = authRepository.register(params)) {
+                            is ApiResult.Success -> onLoginClick()
+                            is ApiResult.Error -> errorMessage = result.message
+                            is ApiResult.NetworkError -> errorMessage = "네트워크 연결을 확인해 주세요."
+                        }
+                        isRegistering = false
+                    }
+                },
                 onLoginClick = onLoginClick,
-                canSubmit = age.isNotBlank() && gender != GENDER_OPTIONS[0] && occupation.isNotBlank() && contact.isNotBlank()
+                canSubmit = age.isNotBlank() && gender != GENDER_OPTIONS[0] && occupation.isNotBlank() && contact.isNotBlank(),
+                errorMessage = errorMessage,
+                isRegistering = isRegistering
             )
         }
     }
@@ -230,7 +271,9 @@ private fun Step2Content(
     onBackClick: () -> Unit,
     onSubmitClick: () -> Unit,
     onLoginClick: () -> Unit,
-    canSubmit: Boolean
+    canSubmit: Boolean,
+    errorMessage: String? = null,
+    isRegistering: Boolean = false
 ) {
     Text(
         text = "추가 정보를 입력해주세요",
@@ -341,6 +384,15 @@ private fun Step2Content(
 
     Spacer(modifier = Modifier.height(24.dp))
 
+    if (errorMessage != null) {
+        Text(
+            text = errorMessage,
+            color = Color(0xFFB91C1C),
+            fontSize = 13.sp,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -349,13 +401,14 @@ private fun Step2Content(
             text = "이전",
             onClick = onBackClick,
             modifier = Modifier.weight(1f),
-            filled = false
+            filled = false,
+            enabled = !isRegistering
         )
         PrimaryButton(
-            text = "회원가입 완료",
+            text = if (isRegistering) "가입 중…" else "회원가입 완료",
             onClick = onSubmitClick,
             modifier = Modifier.weight(1f),
-            enabled = canSubmit
+            enabled = canSubmit && !isRegistering
         )
     }
 

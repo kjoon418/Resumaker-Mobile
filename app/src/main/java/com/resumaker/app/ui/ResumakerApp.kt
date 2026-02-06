@@ -9,7 +9,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import com.resumaker.app.data.remote.ApiResult
+import com.resumaker.app.data.auth.AuthRepository
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
@@ -89,6 +94,8 @@ fun ResumakerApp(
         }
 
         composable(Routes.MyPage) {
+            val authRepository: AuthRepository = koinInject()
+            val scope = rememberCoroutineScope()
             MyPageScreen(
                 user = sampleUserProfile,
                 educations = sampleEducations,
@@ -97,6 +104,18 @@ fun ResumakerApp(
                 awards = sampleAwards,
                 onBackClick = { navController.popBackStack() },
                 onSaveClick = { },
+                onLogout = {
+                    scope.launch {
+                        when (val result = authRepository.logout()) {
+                            is ApiResult.Success -> navController.navigate(Routes.Login) {
+                                popUpTo(Routes.Login) { inclusive = true }
+                            }
+                            is ApiResult.Error -> { /* TODO: 에러 메시지 표시(스낵바 등) */ }
+                            is ApiResult.NetworkError -> { /* TODO: 네트워크 오류 표시 */ }
+                        }
+                    }
+                },
+                onWithdraw = { /* 회원 탈퇴 추후 구현 */ },
                 onNavigate = { route ->
                     navController.navigate(route) {
                         popUpTo(Routes.Home) { inclusive = false }

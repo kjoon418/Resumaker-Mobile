@@ -23,6 +23,9 @@ object Routes {
     /** 새 이력서 작성 1단계: 기존 이력서 제출 */
     const val NewResume = "resumes/new"
 
-    /** 새 이력서 작성 2단계 (추후 구현) */
+    /** 새 이력서 작성 2단계: 이력서 정보 입력 */
     const val NewResumeStep2 = "resumes/new/step2"
+
+    /** 새 이력서 작성 3단계 (추후 구현) */
+    const val NewResumeStep3 = "resumes/new/step3"
 }

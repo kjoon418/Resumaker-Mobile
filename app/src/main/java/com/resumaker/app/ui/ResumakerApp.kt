@@ -23,6 +23,7 @@ import com.resumaker.app.model.Resume
 import com.resumaker.app.ui.careermanager.CareerManagerScreen
 import com.resumaker.app.ui.login.ResumakerLoginScreen
 import com.resumaker.app.ui.navigation.Routes
+import com.resumaker.app.ui.resumelist.ResumeListScreen
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
 
 @Composable
@@ -64,9 +65,15 @@ fun ResumakerApp(
         }
 
         composable(Routes.AllResumes) {
-            PlaceholderScreen(
-                title = "내 이력서",
-                onNavigateBack = { navController.popBackStack() }
+            ResumeListScreen(
+                resumeList = sampleResumes,
+                onBackClick = { navController.popBackStack() },
+                onSearchClick = { },
+                onEditClick = { navController.navigate(Routes.NewResume) },
+                onPdfDownloadClick = { },
+                onRenameClick = { },
+                onDeleteClick = { },
+                onAddNewClick = { navController.navigate(Routes.NewResume) }
             )
         }
 

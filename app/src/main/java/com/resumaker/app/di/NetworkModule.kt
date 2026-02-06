@@ -1,6 +1,7 @@
 package com.resumaker.app.di
 
 import com.resumaker.app.data.auth.AuthApiService
+import com.resumaker.app.data.generate.GenerateResumeApiService
 import com.resumaker.app.data.mypage.MypageApiService
 import com.resumaker.app.data.parsepdf.ParsePdfApiService
 import com.resumaker.app.data.persona.PersonaApiService
@@ -19,5 +20,8 @@ val networkModule = module {
     }
     single<ParsePdfApiService> {
         RetrofitClient.createService(ParsePdfApiService::class.java)
+    }
+    single<GenerateResumeApiService> {
+        RetrofitClient.createService(GenerateResumeApiService::class.java)
     }
 }

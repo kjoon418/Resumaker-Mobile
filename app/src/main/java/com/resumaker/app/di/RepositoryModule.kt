@@ -1,6 +1,7 @@
 package com.resumaker.app.di
 
 import com.resumaker.app.data.auth.AuthRepository
+import com.resumaker.app.data.generate.GenerateResumeRepository
 import com.resumaker.app.data.mypage.MypageRepository
 import com.resumaker.app.data.parsepdf.ParsePdfRepository
 import com.resumaker.app.data.persona.PersonaRepository
@@ -11,4 +12,5 @@ val repositoryModule = module {
     single { PersonaRepository(get()) }
     single { MypageRepository(get()) }
     single { ParsePdfRepository(get()) }
+    single { GenerateResumeRepository(get()) }
 }

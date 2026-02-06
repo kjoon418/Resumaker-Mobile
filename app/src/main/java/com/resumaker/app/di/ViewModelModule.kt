@@ -5,7 +5,9 @@ import com.resumaker.app.ui.login.LoginViewModel
 import com.resumaker.app.ui.mypage.MyPageViewModel
 import com.resumaker.app.ui.personamanagement.PersonaManagementViewModel
 import com.resumaker.app.ui.resumeedit.ResumeEditViewModel
+import com.resumaker.app.ui.resumecreate.ResumeCompletionViewModel
 import com.resumaker.app.ui.resumecreate.ResumeDetailInputViewModel
+import com.resumaker.app.ui.resumecreate.ResumeGeneratingViewModel
 import com.resumaker.app.ui.resumecreate.ResumeUploadViewModel
 import com.resumaker.app.ui.signup.SignUpViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -22,5 +24,7 @@ val viewModelModule = module {
     viewModel { ResumeEditViewModel(get()) }
     viewModel { MyPageViewModel(get()) }
     viewModel { ResumeUploadViewModel(get()) }
-    viewModel { ResumeDetailInputViewModel(get()) }
+    viewModel { ResumeDetailInputViewModel(get(), get()) }
+    viewModel { ResumeGeneratingViewModel(get()) }
+    viewModel { ResumeCompletionViewModel(get()) }
 }

@@ -25,9 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -39,15 +40,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.resumaker.app.component.progress.StepProgressBar
 import com.resumaker.app.ui.theme.ResumakerTheme
+import org.koin.androidx.compose.koinViewModel
 
 private val PrimaryBlue = Color(0xFF2161EE)
 
 @Composable
 fun ResumeGeneratingScreen(
     onBackClick: () -> Unit,
-    onCompleteClick: () -> Unit = {}
+    onCompleteClick: () -> Unit,
+    viewModel: ResumeGeneratingViewModel = koinViewModel()
 ) {
     BackHandler(onBack = onBackClick)
+    val isGenerating by viewModel.isGenerating.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.startGeneration(onNavigateToCompletion = onCompleteClick)
+    }
     val infiniteTransition = rememberInfiniteTransition(label = "loading")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -140,18 +149,14 @@ fun ResumeGeneratingScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = "평균적으로 약 30초 정도 소요됩니다.\n잠시만 기다려 주세요.",
+                    text = if (error != null) error!!
+                    else "평균적으로 약 30초 정도 소요됩니다.\n잠시만 기다려 주세요.",
                     modifier = Modifier.padding(16.dp),
                     fontSize = 13.sp,
-                    color = Color.LightGray,
+                    color = if (error != null) Color(0xFFDC2626) else Color.LightGray,
                     textAlign = TextAlign.Center,
                     lineHeight = 20.sp
                 )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-            TextButton(onClick = onCompleteClick) {
-                Text("완성 화면 보기", color = PrimaryBlue, fontSize = 14.sp)
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -163,6 +168,9 @@ fun ResumeGeneratingScreen(
 @Composable
 private fun ResumeGeneratingScreenPreview() {
     ResumakerTheme {
-        ResumeGeneratingScreen(onBackClick = { })
+        ResumeGeneratingScreen(
+            onBackClick = { },
+            onCompleteClick = { }
+        )
     }
 }

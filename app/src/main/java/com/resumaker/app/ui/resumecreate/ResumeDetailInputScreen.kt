@@ -94,7 +94,7 @@ fun ResumeDetailInputScreen(
             Column(modifier = Modifier.padding(20.dp)) {
                 PrimaryButton(
                     text = "다음 단계로",
-                    onClick = onNext
+                    onClick = { viewModel.prepareForGenerate(onNext) }
                 )
             }
         }

@@ -1,6 +1,9 @@
 package com.resumaker.app.ui.resumecreate
 
 import androidx.lifecycle.ViewModel
+import com.resumaker.app.data.generate.GenerateResumeRepository
+import com.resumaker.app.data.remote.dto.GenerateResumeProjectItem
+import com.resumaker.app.data.remote.dto.GenerateResumeRequest
 import com.resumaker.app.data.parsepdf.ParsePdfRepository
 import com.resumaker.app.model.ExtraInfoItem
 import com.resumaker.app.model.ParsedResumeDetail
@@ -14,9 +17,11 @@ import kotlinx.coroutines.flow.update
  * 이력서 상세 입력(2단계) 화면 ViewModel.
  * - 초기값: [ParsePdfRepository.getLastParsedDetail]에서 한 번 읽어 채우고, PDF 미제출 시 빈 상태.
  * - 폼 필드 상태 보관 및 업데이트 메서드 제공.
+ * - "다음 단계로" 시 [prepareForGenerate]로 생성 API 요청 Body를 저장 후 Step3으로 이동.
  */
 class ResumeDetailInputViewModel(
-    private val parsePdfRepository: ParsePdfRepository
+    private val parsePdfRepository: ParsePdfRepository,
+    private val generateResumeRepository: GenerateResumeRepository
 ) : ViewModel() {
 
     private val _resumeFormat = MutableStateFlow("")
@@ -91,4 +96,28 @@ class ResumeDetailInputViewModel(
     fun setExtraItems(list: List<ExtraInfoItem>) { _extraItems.value = list }
     fun removeExtraItem(item: ExtraInfoItem) { _extraItems.update { it.filter { i -> i.id != item.id } } }
     fun addExtraItem(item: ExtraInfoItem) { _extraItems.update { it + item } }
+
+    /**
+     * 현재 폼 상태로 [GenerateResumeRequest]를 만들어 Repository에 저장하고 [onNavigate]를 호출합니다.
+     * Step3에서 이 요청으로 generate API를 호출합니다.
+     */
+    fun prepareForGenerate(onNavigate: () -> Unit) {
+        val request = GenerateResumeRequest(
+            resumeFormat = _resumeFormat.value.takeIf { it.isNotBlank() },
+            targetRole = _targetRole.value.takeIf { it.isNotBlank() },
+            headline = _slogan.value.takeIf { it.isNotBlank() },
+            strengthKeywords = _strengthKeywords.value.takeIf { it.isNotEmpty() },
+            projects = _projectHistoryItems.value.map { item ->
+                GenerateResumeProjectItem(
+                    title = item.projectName.takeIf { it.isNotBlank() },
+                    bullets = item.keyTasks.split("\n").map { it.trim() }.filter { it.isNotBlank() }.takeIf { it.isNotEmpty() }
+                )
+            }.takeIf { it.isNotEmpty() },
+            collaborationStyle = _collaborationStyle.value.takeIf { it.isNotBlank() },
+            mainTechStack = _techStacks.value.takeIf { it.isNotEmpty() },
+            futureGoal = _futureGoals.value.takeIf { it.isNotBlank() }
+        )
+        generateResumeRepository.setPendingRequest(request)
+        onNavigate()
+    }
 }

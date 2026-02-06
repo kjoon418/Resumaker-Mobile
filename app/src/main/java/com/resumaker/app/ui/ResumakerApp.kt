@@ -183,7 +183,11 @@ fun ResumakerApp(
                         popUpTo(Routes.Home) { inclusive = true }
                     }
                 },
-                onCompleteClick = { navController.navigate(Routes.NewResumeStep4) }
+                onCompleteClick = {
+                    navController.navigate(Routes.NewResumeStep4) {
+                        popUpTo(Routes.NewResumeStep3) { inclusive = true }
+                    }
+                }
             )
         }
 

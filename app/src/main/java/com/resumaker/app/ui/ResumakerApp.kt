@@ -18,6 +18,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.resumaker.app.model.Persona
+import com.resumaker.app.model.Resume
+import com.resumaker.app.ui.careermanager.CareerManagerScreen
 import com.resumaker.app.ui.login.ResumakerLoginScreen
 import com.resumaker.app.ui.navigation.Routes
 import com.resumaker.app.ui.signup.ResumakerSignUpScreen
@@ -51,13 +54,49 @@ fun ResumakerApp(
         }
 
         composable(Routes.Home) {
+            CareerManagerScreen(
+                resumes = sampleResumes,
+                personas = samplePersonas,
+                onViewAllResumes = { navController.navigate(Routes.AllResumes) },
+                onViewAllPersonas = { navController.navigate(Routes.AllPersonas) },
+                onCreateNewResume = { navController.navigate(Routes.NewResume) }
+            )
+        }
+
+        composable(Routes.AllResumes) {
             PlaceholderScreen(
-                title = "홈",
+                title = "내 이력서",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.AllPersonas) {
+            PlaceholderScreen(
+                title = "면접관 페르소나",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Routes.NewResume) {
+            PlaceholderScreen(
+                title = "새 이력서 작성",
                 onNavigateBack = { navController.popBackStack() }
             )
         }
     }
 }
+
+private val sampleResumes = listOf(
+    Resume("1", "프론트엔드 개발자 이력서", "2025.02.05", "doc"),
+    Resume("2", "백엔드 개발자 지원용", "2025.02.01", "doc"),
+    Resume("3", "풀스택 포트폴리오", "2025.01.28", "doc")
+)
+
+private val samplePersonas = listOf(
+    Persona("1", "친절한 면접관", "많은 피드백을 주며 대화를 이끌어 줍니다.", "persona1"),
+    Persona("2", "날카로운 면접관", "깊이 있는 기술 질문을 주로 합니다.", "persona2"),
+    Persona("3", "비즈니스 관점 면접관", "비즈니스 임팩트와 협업 경험을 묻습니다.", "persona3")
+)
 
 @Composable
 private fun PlaceholderScreen(

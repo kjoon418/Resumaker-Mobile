@@ -11,6 +11,15 @@ object Routes {
     /** 회원가입 화면 */
     const val SignUp = "signup"
 
-    /** 홈 등 이후 추가할 화면 예시 */
+    /** 로그인 후 메인: 커리어 매니저 */
     const val Home = "home"
+
+    /** 내 이력서 전체 목록 */
+    const val AllResumes = "resumes"
+
+    /** 면접관 페르소나 전체 목록 */
+    const val AllPersonas = "personas"
+
+    /** 새 이력서 작성 (추후 구현) */
+    const val NewResume = "resumes/new"
 }

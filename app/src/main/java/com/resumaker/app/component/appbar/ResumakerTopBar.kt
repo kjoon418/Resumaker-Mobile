@@ -20,11 +20,16 @@ import androidx.compose.ui.unit.sp
 
 /**
  * 뒤로가기 버튼과 중앙 타이틀이 있는 재사용 가능한 상단 바.
+ *
+ * @param onBackClick 뒤로가기 클릭 시 호출. [showBackButton]이 false면 사용되지 않음.
+ * @param title 상단 바에 표시할 타이틀.
+ * @param showBackButton true면 좌측 뒤로가기 버튼 표시, false면 숨김.
  */
 @Composable
 fun ResumakerTopBar(
     onBackClick: () -> Unit,
     title: String = "Resumaker",
+    showBackButton: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -32,15 +37,17 @@ fun ResumakerTopBar(
             .fillMaxWidth()
             .padding(vertical = 16.dp)
     ) {
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.align(Alignment.CenterStart)
-        ) {
-            Icon(
-                Icons.Default.ArrowBackIosNew,
-                contentDescription = "뒤로가기",
-                modifier = Modifier.size(20.dp)
-            )
+        if (showBackButton) {
+            IconButton(
+                onClick = onBackClick,
+                modifier = Modifier.align(Alignment.CenterStart)
+            ) {
+                Icon(
+                    Icons.Default.ArrowBackIosNew,
+                    contentDescription = "뒤로가기",
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
         Text(
             text = title,

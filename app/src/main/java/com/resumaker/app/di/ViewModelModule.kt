@@ -1,30 +1,11 @@
 package com.resumaker.app.di
 
-import com.resumaker.app.ui.careermanager.CareerManagerViewModel
-import com.resumaker.app.ui.login.LoginViewModel
-import com.resumaker.app.ui.mypage.MyPageViewModel
-import com.resumaker.app.ui.personamanagement.PersonaManagementViewModel
-import com.resumaker.app.ui.resumeedit.ResumeEditViewModel
-import com.resumaker.app.ui.resumecreate.ResumeCompletionViewModel
-import com.resumaker.app.ui.resumecreate.ResumeDetailInputViewModel
-import com.resumaker.app.ui.resumecreate.ResumeGeneratingViewModel
-import com.resumaker.app.ui.resumecreate.ResumeUploadViewModel
-import com.resumaker.app.ui.signup.SignUpViewModel
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 /**
  * ViewModel 정의 모듈.
+ * app 모듈은 중재자 역할만 수행하므로 ViewModel은 각 feature 모듈에서 정의합니다.
  */
 val viewModelModule = module {
-    viewModel { LoginViewModel(get()) }
-    viewModel { SignUpViewModel(get()) }
-    viewModel { CareerManagerViewModel(get()) }
-    viewModel { PersonaManagementViewModel(get()) }
-    viewModel { ResumeEditViewModel(get(), get()) }
-    viewModel { MyPageViewModel(get()) }
-    viewModel { ResumeUploadViewModel(get()) }
-    viewModel { ResumeDetailInputViewModel(get(), get()) }
-    viewModel { ResumeGeneratingViewModel(get()) }
-    viewModel { ResumeCompletionViewModel(get()) }
+    // ViewModels are defined in feature modules (featureCareerManagerModule, featureMyPageModule, featureResumeBuilderModule)
 }

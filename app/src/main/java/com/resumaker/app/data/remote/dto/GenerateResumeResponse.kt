@@ -1,10 +1,12 @@
 package com.resumaker.app.data.remote.dto
 
+import androidx.compose.runtime.Immutable
 import com.google.gson.annotations.SerializedName
 
 /**
  * POST generate/ 응답 Body.
  */
+@Immutable
 data class GenerateResumeResponse(
     @SerializedName("resume_id") val resumeId: Int,
     @SerializedName("created_at") val createdAt: String,
@@ -17,6 +19,7 @@ data class GenerateResumeResponse(
  * type이 "SIMPLE"이면 sub_title은 null, content만 존재.
  * type이 "TITLED"이면 sub_title + content.
  */
+@Immutable
 data class GeneratedResumeItem(
     @SerializedName("element_id") val elementId: Int,
     @SerializedName("type") val type: String,

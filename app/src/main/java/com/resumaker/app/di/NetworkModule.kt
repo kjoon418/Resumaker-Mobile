@@ -1,27 +1,33 @@
 package com.resumaker.app.di
 
-import com.resumaker.app.data.auth.AuthApiService
-import com.resumaker.app.data.generate.GenerateResumeApiService
-import com.resumaker.app.data.mypage.MypageApiService
-import com.resumaker.app.data.parsepdf.ParsePdfApiService
-import com.resumaker.app.data.persona.PersonaApiService
-import com.resumaker.app.data.remote.RetrofitClient
+import com.resumaker.app.BuildConfig
+import com.resumaker.core.network.RetrofitClient
+import com.resumaker.data.auth.AuthApiService
+import com.resumaker.data.mypage.MypageApiService
+import com.resumaker.data.persona.PersonaApiService
+import com.resumaker.data.resume.GenerateResumeApiService
+import com.resumaker.data.resume.ParsePdfApiService
 import org.koin.dsl.module
+
+private val retrofit = RetrofitClient.create(
+    baseUrl = BuildConfig.API_BASE_URL,
+    debug = BuildConfig.DEBUG
+)
 
 val networkModule = module {
     single<AuthApiService> {
-        RetrofitClient.createService(AuthApiService::class.java)
+        RetrofitClient.createService(retrofit, AuthApiService::class.java)
     }
     single<PersonaApiService> {
-        RetrofitClient.createService(PersonaApiService::class.java)
+        RetrofitClient.createService(retrofit, PersonaApiService::class.java)
     }
     single<MypageApiService> {
-        RetrofitClient.createService(MypageApiService::class.java)
+        RetrofitClient.createService(retrofit, MypageApiService::class.java)
     }
     single<ParsePdfApiService> {
-        RetrofitClient.createService(ParsePdfApiService::class.java)
+        RetrofitClient.createService(retrofit, ParsePdfApiService::class.java)
     }
     single<GenerateResumeApiService> {
-        RetrofitClient.createService(GenerateResumeApiService::class.java)
+        RetrofitClient.createService(retrofit, GenerateResumeApiService::class.java)
     }
 }
